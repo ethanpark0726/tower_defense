@@ -49,7 +49,7 @@ const getPathPositionAndDirection = (distance) => {
 export default function EnemyManager() {
   const enemies = useGameStore(state => state.enemies);
   const leakEnemy = useGameStore(state => state.leakEnemy);
-  const waveActive = useGameStore(state => state.waveActive);
+  const wave = useGameStore(state => state.wave);
 
   // InstancedMesh references
   const normalMeshRef = useRef();
@@ -61,22 +61,22 @@ export default function EnemyManager() {
   const hpFgMeshRef = useRef();
 
   // Keep track of spawning elapsed time
-  const waveStartTime = useRef(0);
+  const waveElapsedTime = useRef(0);
   
   // Track high-frequency properties of enemies locally
   // structure: enemyId -> { distanceTraveled }
   const localEnemiesData = useRef(new Map());
 
-  // Reset or adjust spawning timers when wave changes
+  // Reset spawning and movement data only when a new wave starts.
   useEffect(() => {
-    waveStartTime.current = performance.now() / 1000;
-    // Keep local data synced
+    waveElapsedTime.current = 0;
     localEnemiesData.current.clear();
     activeEnemiesPositions.clear();
-  }, [enemies]);
+  }, [wave]);
 
-  useFrame((state) => {
-    const timeNow = state.clock.getElapsedTime();
+  useFrame((state, delta) => {
+    const frameDelta = Math.min(0.05, delta || 0.016);
+    waveElapsedTime.current += frameDelta;
     
     // Counters for instancing index positioning
     let idxNormal = 0;
@@ -98,7 +98,7 @@ export default function EnemyManager() {
       }
 
       // Check if spawned
-      const elapsedWaveTime = timeNow - waveStartTime.current;
+      const elapsedWaveTime = waveElapsedTime.current;
       if (elapsedWaveTime < enemy.spawnDelay) {
         return;
       }
@@ -111,8 +111,7 @@ export default function EnemyManager() {
       }
 
       // Increment distance based on delta
-      const delta = Math.min(0.05, state.clock.getDelta() || 0.016); // cap spike
-      localData.distanceTraveled += delta * enemy.speed;
+      localData.distanceTraveled += frameDelta * enemy.speed;
 
       // Leak check
       if (localData.distanceTraveled >= PATH_TOTAL_LENGTH) {

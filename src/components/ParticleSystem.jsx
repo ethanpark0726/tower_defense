@@ -83,8 +83,8 @@ export default function ParticleSystem() {
     };
   }, []);
 
-  useFrame((state) => {
-    const delta = Math.min(0.05, state.clock.getDelta() || 0.016);
+  useFrame((state, delta) => {
+    const frameDelta = Math.min(0.05, delta || 0.016);
     
     let idx = 0;
     const tempMatrix = new THREE.Matrix4();
@@ -96,18 +96,18 @@ export default function ParticleSystem() {
       if (!p.active) return;
 
       // Increment age
-      p.life += delta;
+      p.life += frameDelta;
       if (p.life >= p.maxLife) {
         p.active = false;
         return;
       }
 
       // Physics: Apply drag and gravity
-      p.velocity.y -= delta * 4.8; // gravity drop
-      p.velocity.multiplyScalar(1 - delta * 1.8); // air resistance/drag
+      p.velocity.y -= frameDelta * 4.8; // gravity drop
+      p.velocity.multiplyScalar(1 - frameDelta * 1.8); // air resistance/drag
       
       // Update coordinates
-      p.position.addScaledVector(p.velocity, delta);
+      p.position.addScaledVector(p.velocity, frameDelta);
 
       // Render coordinates
       tempPosition.copy(p.position);

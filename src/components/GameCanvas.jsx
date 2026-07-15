@@ -109,7 +109,10 @@ export default function GameCanvas() {
       <PerformanceMonitor />
 
       {/* High-fidelity Post-Processing Composer */}
-      <EffectComposer disableNormalPass multisampling={performanceMode === 'high' ? 8 : 0}>
+      <EffectComposer
+        enableNormalPass={performanceMode === 'high'}
+        multisampling={performanceMode === 'high' ? 8 : 0}
+      >
         {performanceMode === 'high' && (
           <SSAO
             intensity={1.5}

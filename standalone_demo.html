@@ -453,14 +453,14 @@
         <!-- Gold HUD -->
         <div class="glass-panel stat-card interactive">
           <div class="stat-details">
-            <span class="stat-label">골드 크레딧</span>
+            <span class="stat-label">Gold Credits</span>
             <span class="stat-value glow-yellow" id="gold-val">400 G</span>
           </div>
         </div>
         <!-- Barrier HUD -->
         <div class="glass-panel stat-card interactive" id="lives-card">
           <div class="stat-details">
-            <span class="stat-label">포탈 배리어</span>
+            <span class="stat-label">Portal Barrier</span>
             <span class="stat-value" id="lives-val" style="color: #fff;">20 HP</span>
           </div>
         </div>
@@ -474,28 +474,28 @@
 
       <!-- Wave Action Trigger -->
       <div class="interactive">
-        <button class="control-btn" id="start-wave-btn">웨이브 시작</button>
+        <button class="control-btn" id="start-wave-btn">Start Wave</button>
       </div>
     </div>
 
     <!-- Instructions / Helpers -->
     <div class="tutorial-tooltip font-cyber glow-cyan" id="help-tooltip">
-      👈 터렛을 선택하고 맵의 격자판에 설치하세요!
+      👈 Choose a turret and place it on the grid!
     </div>
 
     <!-- Shop Menu Bar -->
     <div class="hud-bottom-bar">
       <div class="glass-panel tower-shop interactive" id="shop-bar">
         <div class="tower-item interactive" data-type="laser" id="shop-laser">
-          <div class="tower-name">레이저 터렛</div>
+          <div class="tower-name">Laser Turret</div>
           <div class="tower-cost">100G</div>
         </div>
         <div class="tower-item interactive" data-type="cannon" id="shop-cannon">
-          <div class="tower-name">중력 캐논</div>
+          <div class="tower-name">Gravity Cannon</div>
           <div class="tower-cost">180G</div>
         </div>
         <div class="tower-item interactive" data-type="tesla" id="shop-tesla">
-          <div class="tower-name">테슬라 코일</div>
+          <div class="tower-name">Tesla Coil</div>
           <div class="tower-cost">250G</div>
         </div>
       </div>
@@ -503,30 +503,30 @@
 
     <!-- Placed Tower Actions Menu -->
     <div class="glass-panel hud-sidebar interactive" id="details-sidebar">
-      <div class="sidebar-title font-cyber" id="detail-name">레이저 터렛</div>
+      <div class="sidebar-title font-cyber" id="detail-name">Laser Turret</div>
       <div style="display: flex; flex-direction: column; gap: 8px; margin: 8px 0;">
         <div class="stat-row">
-          <span>레벨 등급</span>
+          <span>Level</span>
           <span style="color: var(--neon-yellow);" id="detail-level">Lv. 1 / 3</span>
         </div>
         <div class="stat-row">
-          <span>사정거리</span>
+          <span>Range</span>
           <span id="detail-range">6.0m</span>
         </div>
         <div class="stat-row">
-          <span>공격력</span>
+          <span>Damage</span>
           <span id="detail-damage">15 pt</span>
         </div>
         <div class="stat-row">
-          <span>발사 속도</span>
-          <span id="detail-firerate">4.0 /초</span>
+          <span>Fire Rate</span>
+          <span id="detail-firerate">4.0 /sec</span>
         </div>
       </div>
       <div class="action-btn-group">
-        <button class="btn-secondary upgrade" id="upgrade-btn">강화</button>
-        <button class="btn-secondary sell" id="sell-btn">환급</button>
+        <button class="btn-secondary upgrade" id="upgrade-btn">Upgrade</button>
+        <button class="btn-secondary sell" id="sell-btn">Sell</button>
       </div>
-      <button class="btn-secondary" style="padding: 6px; font-size: 0.75rem; margin-top: 4px;" id="close-sidebar-btn">창 닫기</button>
+      <button class="btn-secondary" style="padding: 6px; font-size: 0.75rem; margin-top: 4px;" id="close-sidebar-btn">Close</button>
     </div>
   </div>
 
@@ -536,10 +536,10 @@
       <h1 class="brand-title">CYBER DEFENSE</h1>
       <p class="brand-subtitle font-cyber">3D Hyper Tactical Tower Defense</p>
       <p class="modal-desc">
-        어린이를 위한 직관적인 3D 타워 디펜스 게임!<br>
-        터렛을 설치하고 우주 몬스터들의 침공을 막아내세요. (더블클릭 실행 지원)
+        An approachable 3D tower defense game for young players!<br>
+        Build turrets and stop the space monster invasion. (Double-click to launch.)
       </p>
-      <button class="control-btn interactive" id="play-btn">게임 시작</button>
+      <button class="control-btn interactive" id="play-btn">Start Game</button>
     </div>
   </div>
 
@@ -570,9 +570,9 @@
     ];
 
     const TOWER_TYPES = {
-      laser: { name: '레이저 터렛', cost: 100, range: 6.0, damage: 15, fireRate: 4.0, color: '#00f2fe' },
-      cannon: { name: '중력 캐논', cost: 180, range: 8.0, damage: 60, fireRate: 0.8, color: '#ff007f' },
-      tesla: { name: '테슬라 코일', cost: 250, range: 5.0, damage: 35, fireRate: 2.0, color: '#9d4edd' }
+      laser: { name: 'Laser Turret', cost: 100, range: 6.0, damage: 15, fireRate: 4.0, color: '#00f2fe' },
+      cannon: { name: 'Gravity Cannon', cost: 180, range: 8.0, damage: 60, fireRate: 0.8, color: '#ff007f' },
+      tesla: { name: 'Tesla Coil', cost: 250, range: 5.0, damage: 35, fireRate: 2.0, color: '#9d4edd' }
     };
 
     let GAME_STATE = {
@@ -1224,15 +1224,15 @@
           document.getElementById('detail-level').innerText = `Lv. ${t.level} / 3`;
           document.getElementById('detail-range').innerText = `${t.range.toFixed(1)}m`;
           document.getElementById('detail-damage').innerText = `${Math.round(t.damage)} pt`;
-          document.getElementById('detail-firerate').innerText = `${t.fireRate.toFixed(1)} /초`;
+          document.getElementById('detail-firerate').innerText = `${t.fireRate.toFixed(1)} /sec`;
           
           if (t.level < 3) {
             const upCost = Math.round(TOWER_TYPES[t.type].cost * 0.7 * t.level);
-            upgradeBtn.innerText = `강화 (${upCost}G)`;
+            upgradeBtn.innerText = `Upgrade (${upCost}G)`;
             upgradeBtn.disabled = GAME_STATE.gold < upCost;
             upgradeBtn.style.opacity = GAME_STATE.gold < upCost ? 0.5 : 1;
           } else {
-            upgradeBtn.innerText = '최고 등급';
+            upgradeBtn.innerText = 'Max Level';
             upgradeBtn.disabled = true;
             upgradeBtn.style.opacity = 0.5;
           }
@@ -1254,7 +1254,7 @@
         else el.classList.remove('selected');
       });
 
-      helpTooltip.innerText = '격자판(그리드)의 빈 바닥을 클릭하여 터렛을 배치하세요!';
+      helpTooltip.innerText = 'Click an empty grid tile to place the turret!';
       helpTooltip.style.borderColor = 'var(--neon-green)';
       helpTooltip.style.color = 'var(--neon-green)';
       helpTooltip.style.display = 'block';
@@ -1268,7 +1268,7 @@
       holoMesh.visible = false;
       
       if (GAME_STATE.towers.length === 0) {
-        helpTooltip.innerText = '👈 터렛을 선택하고 맵의 격자판에 설치하세요!';
+        helpTooltip.innerText = '👈 Choose a turret and place it on the grid!';
         helpTooltip.style.borderColor = 'var(--neon-cyan)';
         helpTooltip.style.color = 'var(--neon-cyan)';
         helpTooltip.style.display = 'block';
@@ -1384,8 +1384,8 @@
       overlay.innerHTML = `
         <div class="glass-panel modal-card">
           <h1 class="modal-title glow-magenta" style="color: var(--neon-magenta);">SYSTEM DEFEATED</h1>
-          <p class="modal-desc">에너지 배리어가 무너졌습니다!<br>최종 기록: Wave ${GAME_STATE.wave}</p>
-          <button class="control-btn interactive" onclick="window.location.reload()">다시 시작</button>
+          <p class="modal-desc">The energy barrier collapsed!<br>Final result: Wave ${GAME_STATE.wave}</p>
+          <button class="control-btn interactive" onclick="window.location.reload()">Try Again</button>
         </div>
       `;
       document.body.appendChild(overlay);
@@ -1400,8 +1400,8 @@
       overlay.innerHTML = `
         <div class="glass-panel modal-card">
           <h1 class="modal-title glow-green" style="color: var(--neon-green);">VICTORY ACHIEVED</h1>
-          <p class="modal-desc">임무 완수! 포탈의 통제권을 완전히 확보했습니다.</p>
-          <button class="control-btn interactive" onclick="window.location.reload()">처음으로</button>
+          <p class="modal-desc">Mission complete! The portal is fully secure.</p>
+          <button class="control-btn interactive" onclick="window.location.reload()">Main Menu</button>
         </div>
       `;
       document.body.appendChild(overlay);
