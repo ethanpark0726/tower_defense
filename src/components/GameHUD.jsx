@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useGameStore, TOWER_TYPES } from '../gameStore';
+import { ENEMY_TYPES, getWaveComposition, TOTAL_WAVES, TOWER_TYPES, useGameStore } from '../gameStore';
 import { activeEnemiesPositions } from '../activeEnemyRegistry';
-import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star, Sparkles } from 'lucide-react';
+import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star, Sparkles, Cookie, Candy, Crown } from 'lucide-react';
 
 export default function GameHUD() {
   const {
@@ -26,6 +26,7 @@ export default function GameHUD() {
   } = useGameStore();
 
   const selectedPlacedTower = towers.find(t => t.id === selectedPlacedTowerId);
+  const nextWaveComposition = useMemo(() => getWaveComposition(wave + 1), [wave]);
   const [visibleReward, setVisibleReward] = useState(null);
   const [visibleBrushBlast, setVisibleBrushBlast] = useState(null);
 
@@ -77,6 +78,12 @@ export default function GameHUD() {
     })));
   };
 
+  const previewTip = nextWaveComposition.boss > 0
+    ? 'Jelly King alert! Upgrade your strongest defenders.'
+    : nextWaveComposition.fast > 0
+      ? 'Wrapped Candy moves fast. Carrot Shooters can help.'
+      : 'Chocolate Blocks are coming. Build near the route.';
+
   return (
     <div className="hud-container">
       {/* 1. TOP STATS BAR */}
@@ -111,7 +118,7 @@ export default function GameHUD() {
         {/* Wave Stats */}
         <div className="glass-panel wave-card interactive">
           <span className="wave-label">Snack Patrol</span>
-          <div className="wave-number">WAVE {wave} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ 10</span></div>
+          <div className="wave-number">WAVE {wave} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ {TOTAL_WAVES}</span></div>
         </div>
 
         {/* Next Wave Button */}
@@ -141,6 +148,43 @@ export default function GameHUD() {
           </button>
         </div>
       </div>
+
+      {!waveActive && wave < TOTAL_WAVES && (
+        <section
+          className={`glass-panel wave-preview ${nextWaveComposition.boss > 0 ? 'boss-alert' : ''}`}
+          aria-label={`Wave ${wave + 1} snack preview`}
+        >
+          <div className="wave-preview-heading">
+            <div>
+              <span>Up Next</span>
+              <strong>Wave {wave + 1}</strong>
+            </div>
+            <span className="wave-preview-total">{nextWaveComposition.total} snacks</span>
+          </div>
+          <div className="wave-preview-list">
+            <div className="wave-preview-enemy chocolate">
+              <Cookie size={21} />
+              <span>{ENEMY_TYPES.normal.name}</span>
+              <strong>{nextWaveComposition.normal}</strong>
+            </div>
+            {nextWaveComposition.fast > 0 && (
+              <div className="wave-preview-enemy candy">
+                <Candy size={21} />
+                <span>{ENEMY_TYPES.fast.name}</span>
+                <strong>{nextWaveComposition.fast}</strong>
+              </div>
+            )}
+            {nextWaveComposition.boss > 0 && (
+              <div className="wave-preview-enemy jelly">
+                <Crown size={21} />
+                <span>{ENEMY_TYPES.boss.name}</span>
+                <strong>{nextWaveComposition.boss}</strong>
+              </div>
+            )}
+          </div>
+          <p className="wave-preview-tip">{previewTip}</p>
+        </section>
+      )}
 
       {visibleReward && (
         <div className="reward-banner" role="status">

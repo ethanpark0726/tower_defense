@@ -10,6 +10,18 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.6.0] - 2026-07-15
+
+### Added
+
+- Added a next-wave preview with Chocolate Block, Wrapped Candy, and Jelly King counts.
+- Added contextual preparation tips and a distinct Jelly King warning style.
+
+### Changed
+
+- Centralized wave composition and total-wave rules so the preview and enemy spawning always use the same data.
+- Hid the preview during active waves to keep the route and combat view clear.
+
 ## [1.5.0] - 2026-07-15
 
 ### Added
