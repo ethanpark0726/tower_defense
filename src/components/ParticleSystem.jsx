@@ -26,16 +26,16 @@ export default function ParticleSystem() {
       // Configure explosion settings based on impact type
       let numParticles = 12;
       let explosionSpeed = 3.5;
-      let particleColors = ['#00f2fe', '#ffffff']; // laser default
+      let particleColors = ['#f97316', '#fbbf24', '#fff4d6']; // carrot default
 
       if (type === 'cannon') {
         numParticles = 25; // larger explosion
         explosionSpeed = 6.0;
-        particleColors = ['#ff007f', '#ff8a00', '#ffd000', '#ffffff'];
+        particleColors = ['#2f9e44', '#66bb45', '#d9f99d', '#fff4d6'];
       } else if (type === 'tesla') {
         numParticles = 16;
         explosionSpeed = 4.5;
-        particleColors = ['#9d4edd', '#d284ff', '#ffffff'];
+        particleColors = ['#7bdff2', '#d7f3ff', '#ffffff'];
       } else if (type === 'chocolate') {
         numParticles = 20;
         explosionSpeed = 4.2;
@@ -155,8 +155,12 @@ export default function ParticleSystem() {
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[null, null, PARTICLE_POOL_SIZE]}>
-      {/* Box geometries make cheap, retro sci-fi sparks */}
+    <instancedMesh
+      ref={meshRef}
+      args={[null, null, PARTICLE_POOL_SIZE]}
+      frustumCulled={false}
+    >
+      {/* Box geometries make lightweight food-impact confetti */}
       <boxGeometry args={[1, 1, 1]} />
       <meshBasicMaterial toneMapped={false} />
     </instancedMesh>

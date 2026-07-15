@@ -227,29 +227,29 @@ export default function ProjectileSystem() {
 
   return (
     <group>
-      {/* 1. Laser Bolts (Cyan glowing cylinders) */}
-      <instancedMesh ref={laserMeshRef} args={[null, null, POOL_SIZE]}>
+      {/* Carrot shots */}
+      <instancedMesh ref={laserMeshRef} args={[null, null, POOL_SIZE]} frustumCulled={false}>
         <cylinderGeometry args={[0.4, 0.4, 1.0, 8]} />
         <meshBasicMaterial
-          color="#00f2fe"
+          color="#f97316"
           toneMapped={false} // bypass tone mapping for high Bloom output
         />
       </instancedMesh>
 
-      {/* 2. Cannon Shells (Heavy glowing pink spheres) */}
-      <instancedMesh ref={cannonMeshRef} args={[null, null, POOL_SIZE]}>
+      {/* Broccoli bursts */}
+      <instancedMesh ref={cannonMeshRef} args={[null, null, POOL_SIZE]} frustumCulled={false}>
         <sphereGeometry args={[1.0, 16, 16]} />
         <meshBasicMaterial
-          color="#ff007f"
+          color="#45b649"
           toneMapped={false}
         />
       </instancedMesh>
 
-      {/* 3. Tesla Lightning Beams (Purple stretched lines) */}
-      <instancedMesh ref={teslaMeshRef} args={[null, null, POOL_SIZE]}>
+      {/* Calcium-rich milk beams */}
+      <instancedMesh ref={teslaMeshRef} args={[null, null, POOL_SIZE]} frustumCulled={false}>
         <cylinderGeometry args={[1.0, 1.0, 1.0, 8]} />
         <meshBasicMaterial
-          color="#d284ff"
+          color="#d7f3ff"
           toneMapped={false}
         />
       </instancedMesh>

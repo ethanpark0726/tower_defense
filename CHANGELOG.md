@@ -10,8 +10,21 @@ All notable changes to this project are recorded in this file.
 
 ### Planned
 
-- Replace cyber turrets with healthy-food defenders.
 - Redesign the HUD and tutorials for younger players.
+
+## [1.3.0] - 2026-07-14
+
+### Added
+
+- Added Carrot Shooter, Broccoli Bomber, and Milk Beam character models built from lightweight Three.js primitives.
+- Added distinct carrot, broccoli, and milk shop icons, attack colors, and food-impact particle palettes.
+- Added visible level decorations to communicate tower upgrades on the board.
+
+### Changed
+
+- Replaced the cyber-turret names and descriptions with healthy-food defender roles while preserving their established balance and attack behavior.
+- Updated placement tutorial text to introduce healthy defenders.
+- Disabled frustum culling for dynamically pooled projectiles and particles so active effects remain visible after hidden instances are reused.
 
 ## [1.2.0] - 2026-07-14
 

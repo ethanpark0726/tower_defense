@@ -42,34 +42,34 @@ export const isCellOnPath = (x, z) => {
 // Tower Type Definitions
 export const TOWER_TYPES = {
   laser: {
-    name: 'Laser Turret',
+    name: 'Carrot Shooter',
     cost: 100,
     range: 6.0,
     damage: 15,
     fireRate: 4.0, // Bullets per sec
     attackStyle: 'rapid',
-    color: '#00f2fe',
-    description: 'Rapidly fires plasma bolts at a single target.'
+    color: '#f97316',
+    description: 'Rapidly fires crunchy carrot shots at one snack.'
   },
   cannon: {
-    name: 'Gravity Cannon',
+    name: 'Broccoli Bomber',
     cost: 180,
     range: 8.0,
     damage: 60,
     fireRate: 0.8, // Low rate
     attackStyle: 'splash',
-    color: '#ff007f',
-    description: 'Launches energy orbs that damage enemies in an area.'
+    color: '#45b649',
+    description: 'Launches broccoli bursts that splash nearby snacks.'
   },
   tesla: {
-    name: 'Tesla Coil',
+    name: 'Milk Beam',
     cost: 250,
     range: 5.0,
     damage: 35,
     fireRate: 2.0,
     attackStyle: 'beam',
-    color: '#9d4edd',
-    description: 'Strikes nearby enemies with a powerful energy beam.'
+    color: '#7bdff2',
+    description: 'Sprays a calcium-rich milk beam at nearby snacks.'
   }
 };
 
