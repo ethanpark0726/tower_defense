@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ENEMY_TYPES, getWaveComposition, TOTAL_WAVES, TOWER_TYPES, useGameStore } from '../gameStore';
+import { DIFFICULTIES, ENEMY_TYPES, getWaveComposition, TOTAL_WAVES, TOWER_TYPES, useGameStore } from '../gameStore';
 import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star, Sparkles, Cookie, Candy, Crown } from 'lucide-react';
 
@@ -9,6 +9,7 @@ export default function GameHUD() {
     lives,
     wave,
     waveActive,
+    difficulty,
     startWave,
     soundEnabled,
     toggleSound,
@@ -117,7 +118,7 @@ export default function GameHUD() {
 
         {/* Wave Stats */}
         <div className="glass-panel wave-card interactive">
-          <span className="wave-label">Snack Patrol</span>
+          <span className="wave-label">{DIFFICULTIES[difficulty].label} Patrol</span>
           <div className="wave-number">WAVE {wave} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ {TOTAL_WAVES}</span></div>
         </div>
 
@@ -269,7 +270,7 @@ export default function GameHUD() {
       {/* 3. TOWER UPGRADE & INFO SIDEBAR (RIGHT SIDE) */}
       {selectedPlacedTower && (
         <div className="glass-panel hud-sidebar interactive">
-          <div className="sidebar-title font-cyber" style={{ color: TOWER_TYPES[selectedPlacedTower.type].color }}>
+          <div className="sidebar-title font-display" style={{ color: TOWER_TYPES[selectedPlacedTower.type].color }}>
             {TOWER_TYPES[selectedPlacedTower.type].name}
           </div>
           

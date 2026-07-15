@@ -13,6 +13,8 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 5: child-friendly HUD, tutorial, sound, and rewards - complete
 - Phase 6: once-per-wave Brush Blast ability - complete
 - Phase 7: data-driven next-wave snack preview - complete
+- Phase 8: Tooth Guardians browser branding and metadata - complete
+- Phase 9: selectable difficulty and rebalanced snack waves - complete
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
@@ -55,6 +57,7 @@ GitHub Actions runs the English-only policy check, commit whitespace validation,
 ## Game Controls
 
 - Select a tower from the bottom shop.
+- Choose Easy, Normal, or Challenge patrol difficulty from the main menu.
 - Click an empty grid tile to place it.
 - Click a placed tower to inspect, upgrade, or sell it.
 - Start the next wave from the top-right button.

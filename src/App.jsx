@@ -3,8 +3,8 @@ import confetti from 'canvas-confetti';
 import GameCanvas from './components/GameCanvas';
 import GameHUD from './components/GameHUD';
 import SoundFeedback from './components/SoundFeedback';
-import { useGameStore } from './gameStore';
-import { Play, RotateCcw, AlertTriangle, ShieldCheck, Heart, Sparkles } from 'lucide-react';
+import { DIFFICULTIES, useGameStore } from './gameStore';
+import { Play, RotateCcw, AlertTriangle, ShieldCheck, Heart, Sparkles, Smile, Shield, Flame } from 'lucide-react';
 
 function CelebrationEffects() {
   const lastWaveReward = useGameStore((state) => state.lastWaveReward);
@@ -31,7 +31,8 @@ function CelebrationEffects() {
 }
 
 export default function App() {
-  const { gameStatus, startGame, resetGame, wave, performanceMode } = useGameStore();
+  const { gameStatus, startGame, resetGame, wave, performanceMode, difficulty, setDifficulty } = useGameStore();
+  const difficultyIcons = { easy: Smile, normal: Shield, challenge: Flame };
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -74,9 +75,31 @@ export default function App() {
               <span className="team-chip snacks">Chocolate · Candy · Jelly</span>
             </div>
             
+            <fieldset className="difficulty-picker">
+              <legend>Choose Your Patrol</legend>
+              <div className="difficulty-options">
+                {Object.entries(DIFFICULTIES).map(([key, option]) => {
+                  const DifficultyIcon = difficultyIcons[key];
+                  return (
+                    <button
+                      type="button"
+                      key={key}
+                      className={`difficulty-option ${difficulty === key ? 'selected' : ''}`}
+                      onClick={() => setDifficulty(key)}
+                      aria-pressed={difficulty === key}
+                    >
+                      <DifficultyIcon size={21} />
+                      <strong>{option.label}</strong>
+                      <span>{option.description}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
             <button className="control-btn interactive" onClick={startGame}>
               <Play size={20} fill="#fff" />
-              Guard the Tooth
+              Start {DIFFICULTIES[difficulty].label} Patrol
             </button>
           </div>
         </div>
