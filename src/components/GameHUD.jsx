@@ -51,7 +51,7 @@ export default function GameHUD() {
       return { step: 1, text: 'Pick a healthy food from the defender tray.' };
     }
     if (selectedTowerToBuild) {
-      return { step: 2, text: 'Place your defender on an empty mint tile.' };
+      return { step: 2, text: 'Place your defender on an empty tongue tile.' };
     }
     if (wave === 0 && !waveActive) {
       return { step: 3, text: 'Your team is ready! Start the first snack wave.' };

@@ -10,6 +10,19 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.8.0] - 2026-07-15
+
+### Added
+
+- Added a rounded 3D mouth environment with lips, gums, a tongue playfield, and upper and lower tooth rows.
+- Added a warm mouth-themed background while preserving the high-contrast snack route and placement grid.
+
+### Changed
+
+- Updated the placement tutorial to refer to tongue tiles instead of mint tiles.
+- Replaced far-away hidden enemy instance transforms with zero-scale transforms to prevent post-processing artifacts after wave completion.
+- Recreated the post-processing composer when performance mode changes for more reliable rendering transitions.
+
 ## [1.7.0] - 2026-07-15
 
 ### Added

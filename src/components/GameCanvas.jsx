@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls, Environment, Sky } from '@react-three/drei';
+import { OrbitControls, Environment } from '@react-three/drei';
 import { EffectComposer, Bloom, SSAO, SMAA } from '@react-three/postprocessing';
 import GameBoard from './GameBoard';
 import EnemyManager from './EnemyManager';
@@ -72,10 +72,13 @@ export default function GameCanvas() {
         left: 0,
         width: '100%',
         height: '100%',
-        background: '#b8e8ff'
+        background: '#ffd8d2'
       }}
       gl={{ antialias: false, powerPreference: "high-performance" }}
     >
+      <color attach="background" args={['#ffd8d2']} />
+      <fog attach="fog" args={['#ffd8d2', 30, 52]} />
+
       {/* Lights & Ambient Global Illumination */}
       <ambientLight intensity={performanceMode === 'high' ? 0.68 : 0.82} />
       
@@ -96,8 +99,7 @@ export default function GameCanvas() {
       <pointLight position={[-8, 5, -8]} intensity={0.65} color="#ffd166" />
       <pointLight position={[8, 5, 8]} intensity={0.65} color="#ff8fab" />
 
-      {/* Stylized Sky & Environment Map for PBR reflections */}
-      <Sky sunPosition={[8, 18, 5]} inclination={0.35} azimuth={0.25} distance={100} mieCoefficient={0.004} mieDirectionalG={0.75} rayleigh={1.6} turbid={7} />
+      {/* Soft reflections keep the mouth environment bright and friendly */}
       <Environment preset="park" environmentIntensity={0.35} />
 
       {/* Orbit Controls with limited tilt angles (child friendly navigation) */}
@@ -125,6 +127,7 @@ export default function GameCanvas() {
 
       {/* High-fidelity Post-Processing Composer */}
       <EffectComposer
+        key={performanceMode}
         enableNormalPass={performanceMode === 'high'}
         multisampling={performanceMode === 'high' ? 8 : 0}
       >

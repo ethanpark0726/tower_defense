@@ -488,7 +488,7 @@ export default function EnemyManager() {
       healthBarIndex++;
     });
 
-    const hiddenMatrix = new THREE.Matrix4().makeTranslation(9999, 9999, 9999);
+    const hiddenMatrix = new THREE.Matrix4().makeScale(0, 0, 0);
     const hideUnusedInstances = (meshRef, firstUnusedIndex, capacity) => {
       if (!meshRef.current) return;
 
