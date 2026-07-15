@@ -36,6 +36,18 @@ export default function ParticleSystem() {
         numParticles = 16;
         explosionSpeed = 4.5;
         particleColors = ['#9d4edd', '#d284ff', '#ffffff'];
+      } else if (type === 'chocolate') {
+        numParticles = 20;
+        explosionSpeed = 4.2;
+        particleColors = ['#70402b', '#9a5d3d', '#d8a47f', '#fff4d6'];
+      } else if (type === 'candy') {
+        numParticles = 22;
+        explosionSpeed = 5.0;
+        particleColors = ['#ff5d8f', '#ffd166', '#7bdff2', '#fff4d6'];
+      } else if (type === 'jelly') {
+        numParticles = 34;
+        explosionSpeed = 5.8;
+        particleColors = ['#a86cf3', '#8f55d4', '#7bdff2', '#ffd166'];
       }
 
       // Multiply particles and speed based on tower upgrade level
