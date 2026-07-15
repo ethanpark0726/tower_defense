@@ -1,7 +1,110 @@
 import React, { useState } from 'react';
-import { useGameStore, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT, isCellOnPath } from '../gameStore';
-import { useThree } from '@react-three/fiber';
-import * as THREE from 'three';
+import {
+  useGameStore,
+  GRID_CELL_SIZE,
+  GRID_WIDTH,
+  GRID_HEIGHT,
+  WAYPOINTS,
+  isCellOnPath
+} from '../gameStore';
+
+const PATH_WIDTH = GRID_CELL_SIZE * 0.9;
+const PATH_BORDER_WIDTH = PATH_WIDTH + 0.34;
+const disableRaycast = () => null;
+
+const PATH_SEGMENTS = WAYPOINTS.slice(0, -1).map((start, index) => {
+  const end = WAYPOINTS[index + 1];
+  const dx = end.x - start.x;
+  const dz = end.z - start.z;
+
+  return {
+    index,
+    start,
+    dx,
+    dz,
+    length: Math.hypot(dx, dz),
+    angle: Math.atan2(dz, dx),
+    midpoint: [(start.x + end.x) / 2, (start.z + end.z) / 2]
+  };
+});
+
+const PATH_MARKERS = PATH_SEGMENTS.flatMap((segment) => {
+  const markerCount = Math.max(1, Math.floor(segment.length / 3));
+
+  return Array.from({ length: markerCount }, (_, markerIndex) => {
+    const ratio = (markerIndex + 1) / (markerCount + 1);
+    return {
+      key: `${segment.index}_${markerIndex}`,
+      x: segment.start.x + segment.dx * ratio,
+      z: segment.start.z + segment.dz * ratio,
+      angle: segment.angle
+    };
+  });
+});
+
+function CandyGate() {
+  return (
+    <group position={[-11, 1.0, 3]}>
+      <mesh position={[0, -0.2, 0]} castShadow raycast={disableRaycast}>
+        <boxGeometry args={[1.45, 1.4, 0.85]} />
+        <meshStandardMaterial color="#ff7096" roughness={0.65} />
+      </mesh>
+      <mesh position={[0, 0.48, 0]} raycast={disableRaycast}>
+        <torusGeometry args={[0.48, 0.09, 12, 32, Math.PI]} />
+        <meshStandardMaterial color="#fff4d6" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, -0.2, 0.44]} raycast={disableRaycast}>
+        <boxGeometry args={[1.0, 0.24, 0.04]} />
+        <meshStandardMaterial color="#fff4d6" roughness={0.5} />
+      </mesh>
+      <mesh position={[-0.34, 0.38, 0.1]} castShadow raycast={disableRaycast}>
+        <sphereGeometry args={[0.24, 16, 16]} />
+        <meshStandardMaterial color="#ffd166" roughness={0.45} />
+      </mesh>
+      <mesh position={[0.32, 0.42, -0.02]} castShadow raycast={disableRaycast}>
+        <sphereGeometry args={[0.22, 16, 16]} />
+        <meshStandardMaterial color="#7bdff2" roughness={0.45} />
+      </mesh>
+      <pointLight position={[0, 0.3, 0.8]} color="#ff7096" intensity={0.8} distance={4} />
+    </group>
+  );
+}
+
+function ToothGoal() {
+  return (
+    <group position={[11, 1.15, 5]}>
+      <mesh position={[0, 0.25, 0]} scale={[1.0, 1.05, 0.72]} castShadow raycast={disableRaycast}>
+        <sphereGeometry args={[0.92, 32, 32]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.28} emissive="#fff7d6" emissiveIntensity={0.08} />
+      </mesh>
+      <mesh position={[-0.36, -0.55, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
+        <coneGeometry args={[0.38, 1.15, 20]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.3} />
+      </mesh>
+      <mesh position={[0.36, -0.55, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
+        <coneGeometry args={[0.38, 1.15, 20]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.3} />
+      </mesh>
+      <mesh position={[-0.29, 0.42, 0.69]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.075, 12, 12]} />
+        <meshBasicMaterial color="#364153" />
+      </mesh>
+      <mesh position={[0.29, 0.42, 0.69]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.075, 12, 12]} />
+        <meshBasicMaterial color="#364153" />
+      </mesh>
+      <mesh position={[0, 0.12, 0.71]} scale={[1.5, 0.5, 0.35]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.14, 16, 16]} />
+        <meshBasicMaterial color="#ff7096" />
+      </mesh>
+      <mesh position={[0, -1.12, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={disableRaycast}>
+        <torusGeometry args={[1.1, 0.08, 12, 48]} />
+        <meshBasicMaterial color="#7bdff2" transparent opacity={0.75} />
+      </mesh>
+      <pointLight position={[0, 1.2, 1]} color="#fff4b8" intensity={1.2} distance={5} />
+    </group>
+  );
+}
 
 export default function GameBoard() {
   const { 
@@ -67,17 +170,9 @@ export default function GameBoard() {
     }
   };
 
-  // Generate grid tiles to display
-  const tiles = [];
-  for (let x = -halfWidth + GRID_CELL_SIZE/2; x < halfWidth; x += GRID_CELL_SIZE) {
-    for (let z = -halfHeight + GRID_CELL_SIZE/2; z < halfHeight; z += GRID_CELL_SIZE) {
-      tiles.push({ x, z, onPath: isCellOnPath(x, z) });
-    }
-  }
-
   return (
     <group>
-      {/* 1. Base board plane (Metallic Grid Floor) */}
+      {/* Bright mint playfield */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
@@ -88,84 +183,68 @@ export default function GameBoard() {
       >
         <planeGeometry args={[GRID_WIDTH * GRID_CELL_SIZE + 2, GRID_HEIGHT * GRID_CELL_SIZE + 2]} />
         <meshStandardMaterial
-          color="#0d1127"
-          roughness={0.65}
-          metalness={0.9}
+          color="#66b9a8"
+          roughness={0.82}
+          metalness={0.02}
         />
       </mesh>
 
       {/* Grid Lines Overlay */}
       <gridHelper
-        args={[GRID_WIDTH * GRID_CELL_SIZE, GRID_WIDTH, '#00f2fe', '#060a1c']}
+        args={[GRID_WIDTH * GRID_CELL_SIZE, GRID_WIDTH, '#f8fff4', '#4d9d8d']}
         position={[0, 0.01, 0]}
       />
 
-      {/* 2. Path Tiles Rendering */}
-      {tiles.map((tile, i) => {
-        if (!tile.onPath) return null;
-        return (
-          <mesh key={`path_${i}`} position={[tile.x, 0.02, tile.z]} receiveShadow>
-            <boxGeometry args={[GRID_CELL_SIZE - 0.1, 0.05, GRID_CELL_SIZE - 0.1]} />
+      {/* Continuous route with a bright border */}
+      {PATH_SEGMENTS.map((segment) => (
+        <group
+          key={`path_segment_${segment.index}`}
+          position={[segment.midpoint[0], 0.055, segment.midpoint[1]]}
+          rotation={[0, -segment.angle, 0]}
+        >
+          <mesh position={[0, -0.025, 0]} receiveShadow raycast={disableRaycast}>
+            <boxGeometry args={[segment.length + PATH_BORDER_WIDTH, 0.08, PATH_BORDER_WIDTH]} />
+            <meshStandardMaterial color="#fff9e8" roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 0.035, 0]} receiveShadow raycast={disableRaycast}>
+            <boxGeometry args={[segment.length + PATH_WIDTH, 0.1, PATH_WIDTH]} />
             <meshStandardMaterial
-              color="#1a203f"
-              roughness={0.2}
-              metalness={0.8}
-              emissive="#ff007f"
-              emissiveIntensity={0.06}
+              color="#ffd6a5"
+              roughness={0.72}
+              metalness={0.0}
+              emissive="#ff9eb5"
+              emissiveIntensity={0.08}
             />
           </mesh>
-        );
-      })}
+        </group>
+      ))}
+
+      {/* Direction markers stay visible without relying only on color */}
+      {PATH_MARKERS.map((marker) => (
+        <group
+          key={`path_marker_${marker.key}`}
+          position={[marker.x, 0.19, marker.z]}
+          rotation={[0, -marker.angle, 0]}
+        >
+          <mesh rotation={[0, 0, -Math.PI / 2]} raycast={disableRaycast}>
+            <coneGeometry args={[0.24, 0.58, 3]} />
+            <meshBasicMaterial color="#ff5d8f" />
+          </mesh>
+        </group>
+      ))}
 
       {/* Decorative borders for the map */}
       <mesh position={[0, 0.1, halfHeight + 1.1]}>
         <boxGeometry args={[halfWidth * 2 + 4, 0.2, 0.2]} />
-        <meshStandardMaterial color="#00f2fe" roughness={0.3} metalness={0.8} emissive="#00f2fe" emissiveIntensity={0.2} />
+        <meshStandardMaterial color="#ff8fab" roughness={0.55} emissive="#ff8fab" emissiveIntensity={0.12} />
       </mesh>
       <mesh position={[0, 0.1, -halfHeight - 1.1]}>
         <boxGeometry args={[halfWidth * 2 + 4, 0.2, 0.2]} />
-        <meshStandardMaterial color="#00f2fe" roughness={0.3} metalness={0.8} emissive="#00f2fe" emissiveIntensity={0.2} />
+        <meshStandardMaterial color="#7bdff2" roughness={0.55} emissive="#7bdff2" emissiveIntensity={0.12} />
       </mesh>
 
-      {/* Start Portal Visuals */}
-      <group position={[-11, 0.5, 3]}>
-        {/* Outer Ring */}
-        <mesh rotation={[0, Math.PI / 2, 0]}>
-          <torusGeometry args={[0.9, 0.15, 16, 64]} />
-          <meshStandardMaterial color="#39ff14" emissive="#39ff14" emissiveIntensity={0.8} roughness={0.1} />
-        </mesh>
-        {/* Core glow sphere */}
-        <mesh>
-          <sphereGeometry args={[0.5, 16, 16]} />
-          <meshBasicMaterial color="#39ff14" transparent opacity={0.65} />
-        </mesh>
-      </group>
-
-      {/* End Portal Portal (Core Objective) */}
-      <group position={[11, 0.6, 5]}>
-        {/* Core Shield Sphere */}
-        <mesh castShadow receiveShadow>
-          <sphereGeometry args={[1.0, 32, 32]} />
-          <meshStandardMaterial 
-            color="#00f2fe" 
-            emissive="#00f2fe" 
-            emissiveIntensity={0.5} 
-            transparent 
-            opacity={0.4} 
-            roughness={0.0}
-            metalness={1.0}
-          />
-        </mesh>
-        {/* Orbital rings */}
-        <mesh rotation={[Math.PI / 4, 0, 0]}>
-          <torusGeometry args={[1.3, 0.08, 8, 32]} />
-          <meshBasicMaterial color="#00f2fe" />
-        </mesh>
-        <mesh rotation={[-Math.PI / 4, Math.PI / 3, 0]}>
-          <torusGeometry args={[1.4, 0.06, 8, 32]} />
-          <meshBasicMaterial color="#ff007f" />
-        </mesh>
-      </group>
+      <CandyGate />
+      <ToothGoal />
 
       {/* 3. Holographic Placement Indicator */}
       {selectedTowerToBuild && hoveredCell && (
@@ -210,7 +289,7 @@ export default function GameBoard() {
           return (
             <mesh position={[selectedTower.x, 0.06, selectedTower.z]} rotation={[-Math.PI / 2, 0, 0]}>
               <ringGeometry args={[selectedTower.range - 0.05, selectedTower.range + 0.05, 64]} />
-              <meshBasicMaterial color="#00f2fe" transparent opacity={0.6} depthWrite={false} />
+              <meshBasicMaterial color="#fff7d6" transparent opacity={0.75} depthWrite={false} />
             </mesh>
           );
         })()

@@ -6,6 +6,10 @@ import { useGameStore, WAYPOINTS } from '../gameStore';
 // Expose a global, high-frequency map for Turrets to read positions in real-time
 export const activeEnemiesPositions = new Map();
 
+const MAX_ENEMY_INSTANCES = 100;
+const MAX_BOSS_INSTANCES = 20;
+const MAX_HEALTH_BAR_INSTANCES = 120;
+
 // Helper: Calculate total path length
 const calculatePathLength = () => {
   let len = 0;
@@ -199,7 +203,7 @@ export default function EnemyManager() {
     
     // Clean up Normal instances
     if (normalMeshRef.current) {
-      for (let i = idxNormal; i < enemies.length; i++) {
+      for (let i = idxNormal; i < MAX_ENEMY_INSTANCES; i++) {
         normalMeshRef.current.setMatrixAt(i, hideMatrix);
       }
       normalMeshRef.current.instanceMatrix.needsUpdate = true;
@@ -207,7 +211,7 @@ export default function EnemyManager() {
     
     // Clean up Fast instances
     if (fastMeshRef.current) {
-      for (let i = idxFast; i < enemies.length; i++) {
+      for (let i = idxFast; i < MAX_ENEMY_INSTANCES; i++) {
         fastMeshRef.current.setMatrixAt(i, hideMatrix);
       }
       fastMeshRef.current.instanceMatrix.needsUpdate = true;
@@ -215,7 +219,7 @@ export default function EnemyManager() {
 
     // Clean up Boss instances
     if (bossMeshRef.current) {
-      for (let i = idxBoss; i < enemies.length; i++) {
+      for (let i = idxBoss; i < MAX_BOSS_INSTANCES; i++) {
         bossMeshRef.current.setMatrixAt(i, hideMatrix);
       }
       bossMeshRef.current.instanceMatrix.needsUpdate = true;
@@ -223,14 +227,14 @@ export default function EnemyManager() {
 
     // Clean up HP Bar instances
     if (hpBgMeshRef.current) {
-      for (let i = idxHp; i < enemies.length; i++) {
+      for (let i = idxHp; i < MAX_HEALTH_BAR_INSTANCES; i++) {
         hpBgMeshRef.current.setMatrixAt(i, hideMatrix);
       }
       hpBgMeshRef.current.instanceMatrix.needsUpdate = true;
     }
 
     if (hpFgMeshRef.current) {
-      for (let i = idxHp; i < enemies.length; i++) {
+      for (let i = idxHp; i < MAX_HEALTH_BAR_INSTANCES; i++) {
         hpFgMeshRef.current.setMatrixAt(i, hideMatrix);
       }
       hpFgMeshRef.current.instanceMatrix.needsUpdate = true;
@@ -240,7 +244,7 @@ export default function EnemyManager() {
   return (
     <group>
       {/* Normal Enemies: Dark grey/blue metallic octahedron */}
-      <instancedMesh ref={normalMeshRef} args={[null, null, 100]} castShadow receiveShadow>
+      <instancedMesh ref={normalMeshRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
         <octahedronGeometry args={[0.5]} />
         <meshStandardMaterial
           color="#4e5b7c"
@@ -250,7 +254,7 @@ export default function EnemyManager() {
       </instancedMesh>
 
       {/* Fast Enemies: Bright green glowing cone/pyramid */}
-      <instancedMesh ref={fastMeshRef} args={[null, null, 100]} castShadow receiveShadow>
+      <instancedMesh ref={fastMeshRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
         <coneGeometry args={[0.4, 0.9, 4]} />
         <meshStandardMaterial
           color="#39ff14"
@@ -262,7 +266,7 @@ export default function EnemyManager() {
       </instancedMesh>
 
       {/* Boss Enemies: Giant golden sphere-torus knot */}
-      <instancedMesh ref={bossMeshRef} args={[null, null, 20]} castShadow receiveShadow>
+      <instancedMesh ref={bossMeshRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow receiveShadow>
         <torusKnotGeometry args={[0.4, 0.15, 64, 8]} />
         <meshStandardMaterial
           color="#ffd000"
@@ -274,13 +278,13 @@ export default function EnemyManager() {
       </instancedMesh>
 
       {/* Health Bar Backgrounds (Red) */}
-      <instancedMesh ref={hpBgMeshRef} args={[null, null, 120]}>
+      <instancedMesh ref={hpBgMeshRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#ff0044" />
       </instancedMesh>
 
       {/* Health Bar Foregrounds (Green) */}
-      <instancedMesh ref={hpFgMeshRef} args={[null, null, 120]}>
+      <instancedMesh ref={hpFgMeshRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#39ff14" />
       </instancedMesh>
