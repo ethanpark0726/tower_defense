@@ -135,6 +135,8 @@ export const useGameStore = create((set, get) => ({
   soundEnabled: true,
   feedbackEvent: null,
   lastWaveReward: null,
+  brushBlastUsed: false,
+  brushBlastEvent: null,
   
   towers: [],
   enemies: [],
@@ -158,6 +160,8 @@ export const useGameStore = create((set, get) => ({
     selectedTowerToBuild: null,
     selectedPlacedTowerId: null,
     lastWaveReward: null,
+    brushBlastUsed: false,
+    brushBlastEvent: null,
     feedbackEvent: createFeedbackEvent('startGame')
   }),
   
@@ -171,7 +175,9 @@ export const useGameStore = create((set, get) => ({
     waveActive: false,
     selectedTowerToBuild: null,
     selectedPlacedTowerId: null,
-    lastWaveReward: null
+    lastWaveReward: null,
+    brushBlastUsed: false,
+    brushBlastEvent: null
   }),
 
   selectTowerToBuild: (type) => set({ 
@@ -333,7 +339,59 @@ export const useGameStore = create((set, get) => ({
       waveActive: true,
       enemies: enemyList,
       lastWaveReward: null,
+      brushBlastUsed: false,
+      brushBlastEvent: null,
       feedbackEvent: createFeedbackEvent('startWave')
+    });
+  },
+
+  useBrushBlast: (activeEnemies) => {
+    set((state) => {
+      if (!state.waveActive || state.brushBlastUsed) return {};
+
+      const activeIdSet = new Set(activeEnemies.map((enemy) => enemy.id));
+      const targetPositions = activeEnemies.map((enemy) => enemy.position);
+      let hitCount = 0;
+      let totalDamage = 0;
+      let earnedGold = 0;
+
+      const updatedEnemies = state.enemies.map((enemy) => {
+        if (!activeIdSet.has(enemy.id) || enemy.dead || enemy.reachedEnd) return enemy;
+
+        const damage = Math.max(35, Math.round(enemy.maxHp * 0.3));
+        const newHp = Math.max(0, enemy.hp - damage);
+        const isDead = newHp <= 0;
+        hitCount++;
+        totalDamage += Math.min(enemy.hp, damage);
+        if (isDead) earnedGold += enemy.reward;
+        return { ...enemy, hp: newHp, dead: isDead };
+      });
+
+      if (hitCount === 0) {
+        const feedbackEvent = createFeedbackEvent('brushEmpty');
+        return {
+          feedbackEvent,
+          brushBlastEvent: { id: feedbackEvent.id, hitCount: 0, totalDamage: 0, targetPositions: [] }
+        };
+      }
+
+      const activeCount = updatedEnemies.filter((enemy) => !enemy.dead && !enemy.reachedEnd).length;
+      const isWaveDone = activeCount === 0;
+      const waveJustCompleted = state.waveActive && isWaveDone;
+      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave) : 0;
+      const feedbackEvent = createFeedbackEvent('brushBlast');
+
+      return {
+        enemies: updatedEnemies,
+        gold: state.gold + earnedGold + clearBonus,
+        waveActive: !isWaveDone,
+        brushBlastUsed: true,
+        brushBlastEvent: { id: feedbackEvent.id, hitCount, totalDamage, targetPositions },
+        feedbackEvent,
+        ...(waveJustCompleted && {
+          lastWaveReward: { id: `${state.wave}-${Date.now()}`, wave: state.wave, bonus: clearBonus }
+        })
+      };
     });
   },
   

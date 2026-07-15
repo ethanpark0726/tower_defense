@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useGameStore, TOWER_TYPES } from '../gameStore';
-import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star } from 'lucide-react';
+import { activeEnemiesPositions } from '../activeEnemyRegistry';
+import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star, Sparkles } from 'lucide-react';
 
 export default function GameHUD() {
   const {
@@ -12,6 +13,9 @@ export default function GameHUD() {
     soundEnabled,
     toggleSound,
     lastWaveReward,
+    brushBlastUsed,
+    brushBlastEvent,
+    useBrushBlast,
     selectedTowerToBuild,
     selectTowerToBuild,
     towers,
@@ -23,6 +27,7 @@ export default function GameHUD() {
 
   const selectedPlacedTower = towers.find(t => t.id === selectedPlacedTowerId);
   const [visibleReward, setVisibleReward] = useState(null);
+  const [visibleBrushBlast, setVisibleBrushBlast] = useState(null);
 
   useEffect(() => {
     if (!lastWaveReward) return undefined;
@@ -30,6 +35,13 @@ export default function GameHUD() {
     const timeout = window.setTimeout(() => setVisibleReward(null), 8000);
     return () => window.clearTimeout(timeout);
   }, [lastWaveReward]);
+
+  useEffect(() => {
+    if (!brushBlastEvent) return undefined;
+    setVisibleBrushBlast(brushBlastEvent);
+    const timeout = window.setTimeout(() => setVisibleBrushBlast(null), 1400);
+    return () => window.clearTimeout(timeout);
+  }, [brushBlastEvent]);
 
   const tutorial = useMemo(() => {
     if (wave > 1) return null;
@@ -56,6 +68,13 @@ export default function GameHUD() {
       case 'tesla': return <Milk size={size} color={TOWER_TYPES.tesla.color} />;
       default: return null;
     }
+  };
+
+  const handleBrushBlast = () => {
+    useBrushBlast(Array.from(activeEnemiesPositions.values()).map((enemy) => ({
+      id: enemy.id,
+      position: enemy.position.toArray()
+    })));
   };
 
   return (
@@ -132,6 +151,40 @@ export default function GameHUD() {
           </div>
         </div>
       )}
+
+      {visibleBrushBlast && (
+        <div className={`brush-blast-overlay ${visibleBrushBlast.hitCount === 0 ? 'waiting' : ''}`} role="status">
+          <div className="brush-blast-bubble bubble-one" />
+          <div className="brush-blast-bubble bubble-two" />
+          <div className="brush-blast-bubble bubble-three" />
+          <div className="brush-blast-message">
+            <Sparkles size={32} />
+            <strong>{visibleBrushBlast.hitCount > 0 ? 'Brush Blast!' : 'Snacks are still coming!'}</strong>
+            <span>
+              {visibleBrushBlast.hitCount > 0
+                ? `${visibleBrushBlast.hitCount} snacks scrubbed for ${visibleBrushBlast.totalDamage} damage.`
+                : 'Try again when a snack appears on the route.'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="brush-power interactive">
+        <button
+          type="button"
+          className={`brush-power-btn ${waveActive && !brushBlastUsed ? 'ready' : ''}`}
+          onClick={handleBrushBlast}
+          disabled={!waveActive || brushBlastUsed}
+          aria-label={brushBlastUsed ? 'Brush Blast used this wave' : waveActive ? 'Use Brush Blast' : 'Brush Blast charges when a wave starts'}
+          title="Scrub every snack currently visible on the route. Available once per wave."
+        >
+          <Sparkles size={24} />
+          <span>
+            <strong>{brushBlastUsed ? 'Brush Used' : 'Brush Blast'}</strong>
+            <small>{brushBlastUsed ? 'Ready next wave' : waveActive ? 'Once this wave' : 'Charges with wave'}</small>
+          </span>
+        </button>
+      </div>
 
       {/* 2. TOWERS SHOP & HELP INSTRUCTIONS (BOTTOM BAR) */}
       <div className="hud-bottom-bar">

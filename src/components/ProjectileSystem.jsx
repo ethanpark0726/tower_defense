@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../gameStore';
-import { activeEnemiesPositions } from './EnemyManager';
+import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { triggerExplosion } from './ParticleSystem';
 
 // Pre-allocated Projectile Pool Configuration

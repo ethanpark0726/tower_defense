@@ -2,10 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore, WAYPOINTS } from '../gameStore';
+import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { triggerExplosion } from './ParticleSystem';
-
-// High-frequency target data used by the tower and projectile systems.
-export const activeEnemiesPositions = new Map();
 
 const MAX_ENEMY_INSTANCES = 100;
 const MAX_BOSS_INSTANCES = 20;
