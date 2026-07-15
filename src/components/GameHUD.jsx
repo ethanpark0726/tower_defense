@@ -39,7 +39,7 @@ export default function GameHUD() {
           <div className="glass-panel stat-card pulse-glow-cyan interactive">
             <div className="stat-icon"><Coins color="var(--neon-yellow)" fill="var(--neon-yellow)" /></div>
             <div className="stat-details">
-              <span className="stat-label">골드 크레딧</span>
+              <span className="stat-label">Gold Credits</span>
               <span className="stat-value glow-yellow">{gold} G</span>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function GameHUD() {
               />
             </div>
             <div className="stat-details">
-              <span className="stat-label">포탈 배리어</span>
+              <span className="stat-label">Portal Barrier</span>
               <span className="stat-value" style={{ color: lives <= 5 ? 'var(--neon-magenta)' : '#fff' }}>{lives} HP</span>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function GameHUD() {
             }}
           >
             <Swords size={18} />
-            {waveActive ? '웨이브 방어 중...' : '다음 웨이브 시작'}
+            {waveActive ? 'Defending Wave...' : 'Start Next Wave'}
           </button>
         </div>
       </div>
@@ -92,13 +92,13 @@ export default function GameHUD() {
         {/* Helper instruction tooltip for kids */}
         {!selectedTowerToBuild && towers.length === 0 && (
           <div className="tutorial-tooltip font-cyber glow-cyan">
-            👈 터렛을 골라 그리드 판에 설치해 보세요!
+            👈 Choose a turret and place it on the grid!
           </div>
         )}
         
         {selectedTowerToBuild && (
           <div className="tutorial-tooltip font-cyber" style={{ borderStyle: 'solid', color: 'var(--neon-green)', borderColor: 'var(--neon-green)' }}>
-            격자판(그리드)의 빈 바닥을 클릭하여 터렛을 배치하세요!
+            Click an empty grid tile to place the turret!
           </div>
         )}
 
@@ -134,20 +134,20 @@ export default function GameHUD() {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', margin: '8px 0' }}>
             <div className="stat-row">
-              <span>레벨 등급</span>
+              <span>Level</span>
               <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>Lv. {selectedPlacedTower.level} / 3</span>
             </div>
             <div className="stat-row">
-              <span>사정거리</span>
+              <span>Range</span>
               <span>{selectedPlacedTower.range.toFixed(1)}m</span>
             </div>
             <div className="stat-row">
-              <span>공격력</span>
+              <span>Damage</span>
               <span>{Math.round(selectedPlacedTower.damage)} pt</span>
             </div>
             <div className="stat-row">
-              <span>발사 속도</span>
-              <span>{selectedPlacedTower.fireRate.toFixed(1)}/초</span>
+              <span>Fire Rate</span>
+              <span>{selectedPlacedTower.fireRate.toFixed(1)}/sec</span>
             </div>
           </div>
 
@@ -165,13 +165,13 @@ export default function GameHUD() {
                     style={{ opacity: canUpgrade ? 1 : 0.5, cursor: canUpgrade ? 'pointer' : 'not-allowed' }}
                   >
                     <ArrowUpCircle size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                    강화 ({upgradeCost}G)
+                    Upgrade ({upgradeCost}G)
                   </button>
                 );
               })()
             ) : (
               <button className="btn-secondary" disabled style={{ opacity: 0.5, cursor: 'not-allowed', color: 'var(--neon-green)' }}>
-                최고 등급
+                Max Level
               </button>
             )}
 
@@ -181,7 +181,7 @@ export default function GameHUD() {
               onClick={() => sellTower(selectedPlacedTower.id)}
             >
               <Trash2 size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-              환급
+              Sell
             </button>
           </div>
           
@@ -191,7 +191,7 @@ export default function GameHUD() {
             style={{ padding: '6px', fontSize: '0.75rem', marginTop: '4px' }}
             onClick={() => selectPlacedTower(null)}
           >
-            창 닫기
+            Close
           </button>
         </div>
       )}

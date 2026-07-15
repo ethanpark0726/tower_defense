@@ -42,64 +42,79 @@ export const isCellOnPath = (x, z) => {
 // Tower Type Definitions
 export const TOWER_TYPES = {
   laser: {
-    name: '레이저 터렛',
+    name: 'Laser Turret',
     cost: 100,
     range: 6.0,
     damage: 15,
     fireRate: 4.0, // Bullets per sec
+    attackStyle: 'rapid',
     color: '#00f2fe',
-    description: '단일 대상에게 빠른 속도로 플라즈마 레이저를 연사합니다.'
+    description: 'Rapidly fires plasma bolts at a single target.'
   },
   cannon: {
-    name: '중력 캐논',
+    name: 'Gravity Cannon',
     cost: 180,
     range: 8.0,
     damage: 60,
     fireRate: 0.8, // Low rate
+    attackStyle: 'splash',
     color: '#ff007f',
-    description: '광역 범위 피해를 입히는 에너지 구체를 발사합니다.'
+    description: 'Launches energy orbs that damage enemies in an area.'
   },
   tesla: {
-    name: '테슬라 코일',
+    name: 'Tesla Coil',
     cost: 250,
     range: 5.0,
     damage: 35,
     fireRate: 2.0,
+    attackStyle: 'beam',
     color: '#9d4edd',
-    description: '강력한 전기 방전 공격을 가하며, 적을 느리게 만듭니다.'
+    description: 'Strikes nearby enemies with a powerful energy beam.'
+  }
+};
+
+export const ENEMY_TYPES = {
+  normal: {
+    name: 'Scout',
+    baseHp: 120,
+    speed: 2.0,
+    baseReward: 25,
+    size: 0.9,
+    color: '#94a3b8'
+  },
+  fast: {
+    name: 'Runner',
+    baseHp: 70,
+    speed: 3.5,
+    baseReward: 35,
+    size: 0.7,
+    color: '#39ff14'
+  },
+  boss: {
+    name: 'Overlord',
+    baseHp: 500,
+    speed: 1.2,
+    baseReward: 150,
+    size: 1.2,
+    color: '#ffd000'
   }
 };
 
 // Enemy Level Up Wave Multiplier
 const getEnemyStatsForWave = (wave, type) => {
+  const typeData = ENEMY_TYPES[type] ?? ENEMY_TYPES.normal;
   const hpMultiplier = Math.pow(1.3, wave - 1);
   const rewardMultiplier = Math.pow(1.1, wave - 1);
+  const hp = Math.round(typeData.baseHp * hpMultiplier);
 
-  if (type === 'boss') {
-    return {
-      hp: Math.round(500 * hpMultiplier),
-      speed: 1.2,
-      reward: Math.round(150 * rewardMultiplier),
-      size: 1.2,
-      color: '#ffd000'
-    };
-  } else if (type === 'fast') {
-    return {
-      hp: Math.round(70 * hpMultiplier),
-      speed: 3.5,
-      reward: Math.round(35 * rewardMultiplier),
-      size: 0.7,
-      color: '#39ff14'
-    };
-  } else { // normal
-    return {
-      hp: Math.round(120 * hpMultiplier),
-      speed: 2.0,
-      reward: Math.round(25 * rewardMultiplier),
-      size: 0.9,
-      color: '#94a3b8'
-    };
-  }
+  return {
+    hp,
+    maxHp: hp,
+    speed: typeData.speed,
+    reward: Math.round(typeData.baseReward * rewardMultiplier),
+    size: typeData.size,
+    color: typeData.color
+  };
 };
 
 export const useGameStore = create((set, get) => ({

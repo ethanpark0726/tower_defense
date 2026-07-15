@@ -79,8 +79,8 @@ export default function ProjectileSystem() {
     };
   }, [damageEnemy]);
 
-  useFrame((state) => {
-    const delta = Math.min(0.05, state.clock.getDelta() || 0.016);
+  useFrame((state, delta) => {
+    const frameDelta = Math.min(0.05, delta || 0.016);
     
     let idxLaser = 0;
     let idxCannon = 0;
@@ -103,7 +103,7 @@ export default function ProjectileSystem() {
         }
 
         const dist = proj.position.distanceTo(proj.lastTargetPos);
-        const step = proj.speed * delta;
+        const step = proj.speed * frameDelta;
 
         if (step >= dist) {
           // Impact reached!
@@ -161,7 +161,7 @@ export default function ProjectileSystem() {
       
       // Handle Beam/Lightning projectiles (Tesla)
       else if (proj.type === 'tesla') {
-        proj.beamLife += delta;
+        proj.beamLife += frameDelta;
         if (proj.beamLife >= proj.beamMaxLife) {
           proj.active = false;
           return;
