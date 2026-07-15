@@ -75,28 +75,31 @@ export const TOWER_TYPES = {
 
 export const ENEMY_TYPES = {
   normal: {
-    name: 'Scout',
+    name: 'Chocolate Block',
+    theme: 'chocolate',
     baseHp: 120,
     speed: 2.0,
     baseReward: 25,
     size: 0.9,
-    color: '#94a3b8'
+    color: '#70402b'
   },
   fast: {
-    name: 'Runner',
+    name: 'Wrapped Candy',
+    theme: 'candy',
     baseHp: 70,
     speed: 3.5,
     baseReward: 35,
     size: 0.7,
-    color: '#39ff14'
+    color: '#ff5d8f'
   },
   boss: {
-    name: 'Overlord',
+    name: 'Jelly King',
+    theme: 'jelly',
     baseHp: 500,
     speed: 1.2,
     baseReward: 150,
     size: 1.2,
-    color: '#ffd000'
+    color: '#a86cf3'
   }
 };
 
@@ -113,7 +116,8 @@ const getEnemyStatsForWave = (wave, type) => {
     speed: typeData.speed,
     reward: Math.round(typeData.baseReward * rewardMultiplier),
     size: typeData.size,
-    color: typeData.color
+    color: typeData.color,
+    theme: typeData.theme
   };
 };
 

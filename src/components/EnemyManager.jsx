@@ -1,292 +1,610 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore, WAYPOINTS } from '../gameStore';
+import { triggerExplosion } from './ParticleSystem';
 
-// Expose a global, high-frequency map for Turrets to read positions in real-time
+// High-frequency target data used by the tower and projectile systems.
 export const activeEnemiesPositions = new Map();
 
 const MAX_ENEMY_INSTANCES = 100;
 const MAX_BOSS_INSTANCES = 20;
 const MAX_HEALTH_BAR_INSTANCES = 120;
+const MAX_CHOCOLATE_PANEL_INSTANCES = MAX_ENEMY_INSTANCES * 4;
+const MAX_STANDARD_EYE_INSTANCES = MAX_ENEMY_INSTANCES * 2;
+const MAX_CANDY_WRAPPER_INSTANCES = MAX_ENEMY_INSTANCES * 2;
+const MAX_BOSS_EYE_INSTANCES = MAX_BOSS_INSTANCES * 2;
 
-// Helper: Calculate total path length
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const CANDY_STRIPE_ROTATION = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(0, Math.PI / 2, 0)
+);
+const WRAPPER_LEFT_ROTATION = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(0, 0, Math.PI / 2)
+);
+const WRAPPER_RIGHT_ROTATION = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(0, 0, -Math.PI / 2)
+);
+
 const calculatePathLength = () => {
-  let len = 0;
-  for (let i = 0; i < WAYPOINTS.length - 1; i++) {
-    const p1 = WAYPOINTS[i];
-    const p2 = WAYPOINTS[i + 1];
-    len += Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.z - p1.z, 2));
+  let length = 0;
+
+  for (let index = 0; index < WAYPOINTS.length - 1; index++) {
+    const start = WAYPOINTS[index];
+    const end = WAYPOINTS[index + 1];
+    length += Math.hypot(end.x - start.x, end.z - start.z);
   }
-  return len;
+
+  return length;
 };
 
 const PATH_TOTAL_LENGTH = calculatePathLength();
 
-// Helper: Get Vector3 position and direction on the path based on distance traveled
 const getPathPositionAndDirection = (distance) => {
-  let currentDist = 0;
-  const pos = new THREE.Vector3();
-  const dir = new THREE.Vector3(0, 0, 1);
+  let currentDistance = 0;
+  const position = new THREE.Vector3();
+  const direction = new THREE.Vector3(0, 0, 1);
 
-  for (let i = 0; i < WAYPOINTS.length - 1; i++) {
-    const start = WAYPOINTS[i];
-    const end = WAYPOINTS[i + 1];
+  for (let index = 0; index < WAYPOINTS.length - 1; index++) {
+    const start = WAYPOINTS[index];
+    const end = WAYPOINTS[index + 1];
     const dx = end.x - start.x;
     const dz = end.z - start.z;
-    const segLen = Math.sqrt(dx * dx + dz * dz);
+    const segmentLength = Math.hypot(dx, dz);
 
-    if (distance <= currentDist + segLen) {
-      const ratio = (distance - currentDist) / segLen;
-      pos.set(start.x + dx * ratio, start.y, start.z + dz * ratio);
-      dir.set(dx, 0, dz).normalize();
-      return { pos, dir };
+    if (distance <= currentDistance + segmentLength) {
+      const ratio = (distance - currentDistance) / segmentLength;
+      position.set(start.x + dx * ratio, start.y, start.z + dz * ratio);
+      direction.set(dx, 0, dz).normalize();
+      return { position, direction };
     }
-    currentDist += segLen;
+
+    currentDistance += segmentLength;
   }
-  
-  const last = WAYPOINTS[WAYPOINTS.length - 1];
-  pos.set(last.x, last.y, last.z);
-  return { pos, dir };
+
+  const finalWaypoint = WAYPOINTS[WAYPOINTS.length - 1];
+  position.set(finalWaypoint.x, finalWaypoint.y, finalWaypoint.z);
+  return { position, direction };
+};
+
+const getDefeatEffectType = (enemyType) => {
+  if (enemyType === 'fast') return 'candy';
+  if (enemyType === 'boss') return 'jelly';
+  return 'chocolate';
 };
 
 export default function EnemyManager() {
-  const enemies = useGameStore(state => state.enemies);
-  const leakEnemy = useGameStore(state => state.leakEnemy);
-  const wave = useGameStore(state => state.wave);
+  const enemies = useGameStore((state) => state.enemies);
+  const leakEnemy = useGameStore((state) => state.leakEnemy);
+  const wave = useGameStore((state) => state.wave);
 
-  // InstancedMesh references
-  const normalMeshRef = useRef();
-  const fastMeshRef = useRef();
-  const bossMeshRef = useRef();
-  
-  // Health bar background and foreground instanced meshes
-  const hpBgMeshRef = useRef();
-  const hpFgMeshRef = useRef();
+  const chocolateBodyRef = useRef();
+  const chocolatePanelRef = useRef();
+  const chocolateEyeRef = useRef();
+  const chocolateMouthRef = useRef();
 
-  // Keep track of spawning elapsed time
+  const candyBodyRef = useRef();
+  const candyWrapperRef = useRef();
+  const candyStripeRef = useRef();
+  const candyEyeRef = useRef();
+  const candyMouthRef = useRef();
+
+  const jellyBodyRef = useRef();
+  const jellySkirtRef = useRef();
+  const jellyCrownRef = useRef();
+  const jellyEyeRef = useRef();
+  const jellyMouthRef = useRef();
+
+  const hpBackgroundRef = useRef();
+  const hpForegroundRef = useRef();
+
   const waveElapsedTime = useRef(0);
-  
-  // Track high-frequency properties of enemies locally
-  // structure: enemyId -> { distanceTraveled }
   const localEnemiesData = useRef(new Map());
+  const previousEnemyDeadStates = useRef(new Map());
 
-  // Reset spawning and movement data only when a new wave starts.
   useEffect(() => {
     waveElapsedTime.current = 0;
     localEnemiesData.current.clear();
     activeEnemiesPositions.clear();
+    previousEnemyDeadStates.current = new Map(
+      enemies.map((enemy) => [enemy.id, enemy.dead])
+    );
   }, [wave]);
+
+  useEffect(() => {
+    const nextDeadStates = new Map();
+
+    enemies.forEach((enemy) => {
+      const wasDead = previousEnemyDeadStates.current.get(enemy.id);
+      const localData = localEnemiesData.current.get(enemy.id);
+
+      if (enemy.dead && wasDead === false && localData?.lastPosition && triggerExplosion) {
+        triggerExplosion(localData.lastPosition, getDefeatEffectType(enemy.type), 1);
+      }
+
+      nextDeadStates.set(enemy.id, enemy.dead);
+    });
+
+    previousEnemyDeadStates.current = nextDeadStates;
+  }, [enemies]);
 
   useFrame((state, delta) => {
     const frameDelta = Math.min(0.05, delta || 0.016);
+    const time = state.clock.getElapsedTime();
     waveElapsedTime.current += frameDelta;
-    
-    // Counters for instancing index positioning
-    let idxNormal = 0;
-    let idxFast = 0;
-    let idxBoss = 0;
-    let idxHp = 0;
 
-    // Reset high-frequency map
+    let chocolateBodyIndex = 0;
+    let chocolatePanelIndex = 0;
+    let chocolateEyeIndex = 0;
+    let chocolateMouthIndex = 0;
+
+    let candyBodyIndex = 0;
+    let candyWrapperIndex = 0;
+    let candyStripeIndex = 0;
+    let candyEyeIndex = 0;
+    let candyMouthIndex = 0;
+
+    let jellyBodyIndex = 0;
+    let jellySkirtIndex = 0;
+    let jellyCrownIndex = 0;
+    let jellyEyeIndex = 0;
+    let jellyMouthIndex = 0;
+    let healthBarIndex = 0;
+
     activeEnemiesPositions.clear();
 
-    const tempMatrix = new THREE.Matrix4();
-    const tempPosition = new THREE.Vector3();
-    const tempRotation = new THREE.Quaternion();
-    const tempScale = new THREE.Vector3();
+    const matrix = new THREE.Matrix4();
+    const basePosition = new THREE.Vector3();
+    const componentPosition = new THREE.Vector3();
+    const componentOffset = new THREE.Vector3();
+    const baseRotation = new THREE.Quaternion();
+    const componentRotation = new THREE.Quaternion();
+    const animationRotation = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    const healthBarPosition = new THREE.Vector3();
+    const lookDirection = new THREE.Vector3();
+    const leftShift = new THREE.Vector3();
+    const healthBarRotation = new THREE.Quaternion();
+
+    const placeComponent = (
+      meshRef,
+      index,
+      origin,
+      rotation,
+      offsetX,
+      offsetY,
+      offsetZ,
+      scaleX,
+      scaleY,
+      scaleZ,
+      localRotation = null
+    ) => {
+      if (!meshRef.current) return;
+
+      componentOffset.set(offsetX, offsetY, offsetZ).applyQuaternion(rotation);
+      componentPosition.copy(origin).add(componentOffset);
+      componentRotation.copy(rotation);
+
+      if (localRotation) {
+        componentRotation.multiply(localRotation);
+      }
+
+      scale.set(scaleX, scaleY, scaleZ);
+      matrix.compose(componentPosition, componentRotation, scale);
+      meshRef.current.setMatrixAt(index, matrix);
+    };
 
     enemies.forEach((enemy) => {
-      if (enemy.dead || enemy.reachedEnd) {
-        return;
-      }
+      if (enemy.dead || enemy.reachedEnd) return;
+      if (waveElapsedTime.current < enemy.spawnDelay) return;
 
-      // Check if spawned
-      const elapsedWaveTime = waveElapsedTime.current;
-      if (elapsedWaveTime < enemy.spawnDelay) {
-        return;
-      }
-
-      // Update distance traveled
       let localData = localEnemiesData.current.get(enemy.id);
       if (!localData) {
-        localData = { distanceTraveled: 0 };
+        localData = {
+          distanceTraveled: 0,
+          lastPosition: new THREE.Vector3()
+        };
         localEnemiesData.current.set(enemy.id, localData);
       }
 
-      // Increment distance based on delta
       localData.distanceTraveled += frameDelta * enemy.speed;
 
-      // Leak check
       if (localData.distanceTraveled >= PATH_TOTAL_LENGTH) {
-        // Trigger leak
         leakEnemy(enemy.id);
         return;
       }
 
-      // Calculate path coords
-      const { pos, dir } = getPathPositionAndDirection(localData.distanceTraveled);
-      
-      // Save position to global map for turret scanning
+      const { position, direction } = getPathPositionAndDirection(localData.distanceTraveled);
+      const movementAngle = Math.atan2(-direction.z, direction.x);
+      baseRotation.setFromAxisAngle(Y_AXIS, movementAngle);
+      basePosition.copy(position);
+
+      let healthBarHeight = enemy.size * 1.25;
+
+      if (enemy.type === 'normal') {
+        const wobble = Math.sin(time * 5 + localData.distanceTraveled * 0.7) * 0.11;
+        basePosition.y += enemy.size * 0.58;
+        animationRotation.setFromEuler(new THREE.Euler(0, 0, wobble));
+        baseRotation.multiply(animationRotation);
+
+        placeComponent(
+          chocolateBodyRef,
+          chocolateBodyIndex,
+          basePosition,
+          baseRotation,
+          0,
+          0,
+          0,
+          enemy.size,
+          enemy.size,
+          enemy.size
+        );
+
+        const panelOffsets = [
+          [-0.22, 0.15],
+          [0.22, 0.15],
+          [-0.22, -0.15],
+          [0.22, -0.15]
+        ];
+
+        panelOffsets.forEach(([offsetX, offsetY]) => {
+          placeComponent(
+            chocolatePanelRef,
+            chocolatePanelIndex++,
+            basePosition,
+            baseRotation,
+            offsetX * enemy.size,
+            offsetY * enemy.size,
+            0.255 * enemy.size,
+            enemy.size,
+            enemy.size,
+            enemy.size
+          );
+        });
+
+        [-0.19, 0.19].forEach((offsetX) => {
+          placeComponent(
+            chocolateEyeRef,
+            chocolateEyeIndex++,
+            basePosition,
+            baseRotation,
+            offsetX * enemy.size,
+            0.11 * enemy.size,
+            0.29 * enemy.size,
+            enemy.size,
+            enemy.size,
+            enemy.size
+          );
+        });
+
+        placeComponent(
+          chocolateMouthRef,
+          chocolateMouthIndex++,
+          basePosition,
+          baseRotation,
+          0,
+          -0.13 * enemy.size,
+          0.29 * enemy.size,
+          enemy.size,
+          enemy.size,
+          enemy.size
+        );
+
+        chocolateBodyIndex++;
+        healthBarHeight = enemy.size * 1.18;
+      } else if (enemy.type === 'fast') {
+        const bounce = Math.abs(
+          Math.sin(time * 8 + localData.distanceTraveled * 1.4)
+        ) * 0.2;
+        const tilt = Math.sin(time * 7 + localData.distanceTraveled) * 0.16;
+        basePosition.y += enemy.size * 0.62 + bounce;
+        animationRotation.setFromEuler(new THREE.Euler(0, 0, tilt));
+        baseRotation.multiply(animationRotation);
+
+        placeComponent(
+          candyBodyRef,
+          candyBodyIndex,
+          basePosition,
+          baseRotation,
+          0,
+          0,
+          0,
+          enemy.size * 1.05,
+          enemy.size * 0.82,
+          enemy.size * 0.74
+        );
+
+        placeComponent(
+          candyWrapperRef,
+          candyWrapperIndex++,
+          basePosition,
+          baseRotation,
+          -0.62 * enemy.size,
+          0,
+          0,
+          enemy.size,
+          enemy.size,
+          enemy.size,
+          WRAPPER_LEFT_ROTATION
+        );
+        placeComponent(
+          candyWrapperRef,
+          candyWrapperIndex++,
+          basePosition,
+          baseRotation,
+          0.62 * enemy.size,
+          0,
+          0,
+          enemy.size,
+          enemy.size,
+          enemy.size,
+          WRAPPER_RIGHT_ROTATION
+        );
+
+        placeComponent(
+          candyStripeRef,
+          candyStripeIndex++,
+          basePosition,
+          baseRotation,
+          0,
+          0,
+          0,
+          enemy.size,
+          enemy.size,
+          enemy.size,
+          CANDY_STRIPE_ROTATION
+        );
+
+        [-0.18, 0.18].forEach((offsetX) => {
+          placeComponent(
+            candyEyeRef,
+            candyEyeIndex++,
+            basePosition,
+            baseRotation,
+            offsetX * enemy.size,
+            0.1 * enemy.size,
+            0.4 * enemy.size,
+            enemy.size,
+            enemy.size,
+            enemy.size
+          );
+        });
+
+        placeComponent(
+          candyMouthRef,
+          candyMouthIndex++,
+          basePosition,
+          baseRotation,
+          0,
+          -0.1 * enemy.size,
+          0.4 * enemy.size,
+          enemy.size,
+          enemy.size,
+          enemy.size
+        );
+
+        candyBodyIndex++;
+        healthBarHeight = enemy.size * 1.3 + bounce;
+      } else if (enemy.type === 'boss') {
+        const squish = Math.sin(time * 4 + localData.distanceTraveled * 0.35);
+        const horizontalScale = enemy.size * (1 + squish * 0.08);
+        const verticalScale = enemy.size * (0.92 - squish * 0.1);
+        basePosition.y += enemy.size * 0.72;
+
+        placeComponent(
+          jellyBodyRef,
+          jellyBodyIndex,
+          basePosition,
+          baseRotation,
+          0,
+          0,
+          0,
+          horizontalScale,
+          verticalScale,
+          horizontalScale
+        );
+        placeComponent(
+          jellySkirtRef,
+          jellySkirtIndex++,
+          basePosition,
+          baseRotation,
+          0,
+          -0.43 * enemy.size,
+          0,
+          horizontalScale,
+          enemy.size,
+          horizontalScale
+        );
+        placeComponent(
+          jellyCrownRef,
+          jellyCrownIndex++,
+          basePosition,
+          baseRotation,
+          0,
+          0.88 * enemy.size,
+          0,
+          enemy.size,
+          enemy.size,
+          enemy.size
+        );
+
+        [-0.22, 0.22].forEach((offsetX) => {
+          placeComponent(
+            jellyEyeRef,
+            jellyEyeIndex++,
+            basePosition,
+            baseRotation,
+            offsetX * enemy.size,
+            0.12 * enemy.size,
+            0.63 * enemy.size,
+            enemy.size,
+            enemy.size,
+            enemy.size
+          );
+        });
+
+        placeComponent(
+          jellyMouthRef,
+          jellyMouthIndex++,
+          basePosition,
+          baseRotation,
+          0,
+          -0.13 * enemy.size,
+          0.64 * enemy.size,
+          enemy.size,
+          enemy.size,
+          enemy.size
+        );
+
+        jellyBodyIndex++;
+        healthBarHeight = enemy.size * 1.7;
+      }
+
+      localData.lastPosition.copy(basePosition);
       activeEnemiesPositions.set(enemy.id, {
         id: enemy.id,
-        position: pos.clone(),
+        position: basePosition.clone(),
         hp: enemy.hp,
         maxHp: enemy.maxHp,
         size: enemy.size,
         type: enemy.type
       });
 
-      // Prepare enemy scale
-      tempScale.set(enemy.size, enemy.size, enemy.size);
-      
-      // Calculate rotation quaternion pointing in movement direction
-      const angle = Math.atan2(-dir.z, dir.x);
-      tempRotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-      
-      // Compose matrix
-      tempMatrix.compose(pos, tempRotation, tempScale);
+      healthBarPosition.copy(basePosition).addScaledVector(Y_AXIS, healthBarHeight);
+      lookDirection.subVectors(state.camera.position, healthBarPosition).normalize();
+      const lookAngle = Math.atan2(lookDirection.x, lookDirection.z);
+      healthBarRotation.setFromAxisAngle(Y_AXIS, lookAngle);
 
-      // Distribute to proper InstancedMesh
-      if (enemy.type === 'normal') {
-        if (normalMeshRef.current) {
-          normalMeshRef.current.setMatrixAt(idxNormal, tempMatrix);
-          idxNormal++;
-        }
-      } else if (enemy.type === 'fast') {
-        if (fastMeshRef.current) {
-          fastMeshRef.current.setMatrixAt(idxFast, tempMatrix);
-          idxFast++;
-        }
-      } else if (enemy.type === 'boss') {
-        if (bossMeshRef.current) {
-          bossMeshRef.current.setMatrixAt(idxBoss, tempMatrix);
-          idxBoss++;
-        }
-      }
+      scale.set(enemy.size * 1.25, 0.1, 0.02);
+      matrix.compose(healthBarPosition, healthBarRotation, scale);
+      hpBackgroundRef.current?.setMatrixAt(healthBarIndex, matrix);
 
-      // 4. Render Instanced Health Bar
-      // Base placement: slightly above the enemy's head
-      const hpBarPos = pos.clone().add(new THREE.Vector3(0, enemy.size * 0.9 + 0.3, 0));
-      
-      // Rotate health bars to face the camera (Billboard style, roughly facing front-left)
-      const camPos = state.camera.position;
-      const lookDir = new THREE.Vector3().subVectors(camPos, hpBarPos).normalize();
-      const lookAngle = Math.atan2(lookDir.x, lookDir.z);
-      const hpRotation = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), lookAngle);
-
-      // Draw background bar (Red)
-      tempScale.set(enemy.size * 1.2, 0.1, 0.02);
-      tempMatrix.compose(hpBarPos, hpRotation, tempScale);
-      if (hpBgMeshRef.current) {
-        hpBgMeshRef.current.setMatrixAt(idxHp, tempMatrix);
-      }
-
-      // Draw foreground bar (Green - scaled proportionally to HP ratio)
       const hpRatio = Math.max(0, enemy.hp / enemy.maxHp);
-      tempScale.set(enemy.size * 1.2 * hpRatio, 0.1, 0.02);
-      
-      // Offset green bar so it shrinks from right-to-left
-      const leftShift = new THREE.Vector3(- (enemy.size * 1.2 * (1 - hpRatio)) / 2, 0, 0);
-      leftShift.applyQuaternion(hpRotation); // rotate shift to face camera
-      
-      tempMatrix.compose(hpBarPos.clone().add(leftShift), hpRotation, tempScale);
-      if (hpFgMeshRef.current) {
-        hpFgMeshRef.current.setMatrixAt(idxHp, tempMatrix);
-      }
-
-      idxHp++;
+      scale.set(enemy.size * 1.25 * hpRatio, 0.1, 0.02);
+      leftShift
+        .set(-(enemy.size * 1.25 * (1 - hpRatio)) / 2, 0, 0)
+        .applyQuaternion(healthBarRotation);
+      componentPosition.copy(healthBarPosition).add(leftShift);
+      matrix.compose(componentPosition, healthBarRotation, scale);
+      hpForegroundRef.current?.setMatrixAt(healthBarIndex, matrix);
+      healthBarIndex++;
     });
 
-    // Reset matrices of unused instances to offscreen far away so they vanish
-    const hideMatrix = new THREE.Matrix4().makeTranslation(9999, 9999, 9999);
-    
-    // Clean up Normal instances
-    if (normalMeshRef.current) {
-      for (let i = idxNormal; i < MAX_ENEMY_INSTANCES; i++) {
-        normalMeshRef.current.setMatrixAt(i, hideMatrix);
-      }
-      normalMeshRef.current.instanceMatrix.needsUpdate = true;
-    }
-    
-    // Clean up Fast instances
-    if (fastMeshRef.current) {
-      for (let i = idxFast; i < MAX_ENEMY_INSTANCES; i++) {
-        fastMeshRef.current.setMatrixAt(i, hideMatrix);
-      }
-      fastMeshRef.current.instanceMatrix.needsUpdate = true;
-    }
+    const hiddenMatrix = new THREE.Matrix4().makeTranslation(9999, 9999, 9999);
+    const hideUnusedInstances = (meshRef, firstUnusedIndex, capacity) => {
+      if (!meshRef.current) return;
 
-    // Clean up Boss instances
-    if (bossMeshRef.current) {
-      for (let i = idxBoss; i < MAX_BOSS_INSTANCES; i++) {
-        bossMeshRef.current.setMatrixAt(i, hideMatrix);
+      for (let index = firstUnusedIndex; index < capacity; index++) {
+        meshRef.current.setMatrixAt(index, hiddenMatrix);
       }
-      bossMeshRef.current.instanceMatrix.needsUpdate = true;
-    }
 
-    // Clean up HP Bar instances
-    if (hpBgMeshRef.current) {
-      for (let i = idxHp; i < MAX_HEALTH_BAR_INSTANCES; i++) {
-        hpBgMeshRef.current.setMatrixAt(i, hideMatrix);
-      }
-      hpBgMeshRef.current.instanceMatrix.needsUpdate = true;
-    }
+      meshRef.current.instanceMatrix.needsUpdate = true;
+    };
 
-    if (hpFgMeshRef.current) {
-      for (let i = idxHp; i < MAX_HEALTH_BAR_INSTANCES; i++) {
-        hpFgMeshRef.current.setMatrixAt(i, hideMatrix);
-      }
-      hpFgMeshRef.current.instanceMatrix.needsUpdate = true;
-    }
+    hideUnusedInstances(chocolateBodyRef, chocolateBodyIndex, MAX_ENEMY_INSTANCES);
+    hideUnusedInstances(
+      chocolatePanelRef,
+      chocolatePanelIndex,
+      MAX_CHOCOLATE_PANEL_INSTANCES
+    );
+    hideUnusedInstances(chocolateEyeRef, chocolateEyeIndex, MAX_STANDARD_EYE_INSTANCES);
+    hideUnusedInstances(chocolateMouthRef, chocolateMouthIndex, MAX_ENEMY_INSTANCES);
+
+    hideUnusedInstances(candyBodyRef, candyBodyIndex, MAX_ENEMY_INSTANCES);
+    hideUnusedInstances(candyWrapperRef, candyWrapperIndex, MAX_CANDY_WRAPPER_INSTANCES);
+    hideUnusedInstances(candyStripeRef, candyStripeIndex, MAX_ENEMY_INSTANCES);
+    hideUnusedInstances(candyEyeRef, candyEyeIndex, MAX_STANDARD_EYE_INSTANCES);
+    hideUnusedInstances(candyMouthRef, candyMouthIndex, MAX_ENEMY_INSTANCES);
+
+    hideUnusedInstances(jellyBodyRef, jellyBodyIndex, MAX_BOSS_INSTANCES);
+    hideUnusedInstances(jellySkirtRef, jellySkirtIndex, MAX_BOSS_INSTANCES);
+    hideUnusedInstances(jellyCrownRef, jellyCrownIndex, MAX_BOSS_INSTANCES);
+    hideUnusedInstances(jellyEyeRef, jellyEyeIndex, MAX_BOSS_EYE_INSTANCES);
+    hideUnusedInstances(jellyMouthRef, jellyMouthIndex, MAX_BOSS_INSTANCES);
+
+    hideUnusedInstances(hpBackgroundRef, healthBarIndex, MAX_HEALTH_BAR_INSTANCES);
+    hideUnusedInstances(hpForegroundRef, healthBarIndex, MAX_HEALTH_BAR_INSTANCES);
   });
 
   return (
     <group>
-      {/* Normal Enemies: Dark grey/blue metallic octahedron */}
-      <instancedMesh ref={normalMeshRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
-        <octahedronGeometry args={[0.5]} />
-        <meshStandardMaterial
-          color="#4e5b7c"
-          roughness={0.4}
-          metalness={0.8}
-        />
+      {/* Chocolate blocks */}
+      <instancedMesh ref={chocolateBodyRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
+        <boxGeometry args={[0.92, 0.72, 0.46]} />
+        <meshStandardMaterial color="#70402b" roughness={0.72} />
+      </instancedMesh>
+      <instancedMesh ref={chocolatePanelRef} args={[null, null, MAX_CHOCOLATE_PANEL_INSTANCES]} castShadow>
+        <boxGeometry args={[0.31, 0.23, 0.055]} />
+        <meshStandardMaterial color="#9a5d3d" roughness={0.65} />
+      </instancedMesh>
+      <instancedMesh ref={chocolateEyeRef} args={[null, null, MAX_STANDARD_EYE_INSTANCES]}>
+        <sphereGeometry args={[0.065, 10, 10]} />
+        <meshBasicMaterial color="#281912" />
+      </instancedMesh>
+      <instancedMesh ref={chocolateMouthRef} args={[null, null, MAX_ENEMY_INSTANCES]}>
+        <boxGeometry args={[0.18, 0.045, 0.04]} />
+        <meshBasicMaterial color="#281912" />
       </instancedMesh>
 
-      {/* Fast Enemies: Bright green glowing cone/pyramid */}
-      <instancedMesh ref={fastMeshRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
-        <coneGeometry args={[0.4, 0.9, 4]} />
-        <meshStandardMaterial
-          color="#39ff14"
-          roughness={0.2}
-          metalness={0.7}
-          emissive="#39ff14"
-          emissiveIntensity={0.15}
-        />
+      {/* Wrapped candies */}
+      <instancedMesh ref={candyBodyRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
+        <sphereGeometry args={[0.5, 18, 18]} />
+        <meshStandardMaterial color="#ff5d8f" roughness={0.35} emissive="#ff5d8f" emissiveIntensity={0.08} />
+      </instancedMesh>
+      <instancedMesh ref={candyWrapperRef} args={[null, null, MAX_CANDY_WRAPPER_INSTANCES]} castShadow>
+        <coneGeometry args={[0.29, 0.46, 4]} />
+        <meshStandardMaterial color="#ffd166" roughness={0.5} />
+      </instancedMesh>
+      <instancedMesh ref={candyStripeRef} args={[null, null, MAX_ENEMY_INSTANCES]}>
+        <torusGeometry args={[0.34, 0.055, 8, 20]} />
+        <meshStandardMaterial color="#fff4d6" roughness={0.4} />
+      </instancedMesh>
+      <instancedMesh ref={candyEyeRef} args={[null, null, MAX_STANDARD_EYE_INSTANCES]}>
+        <sphereGeometry args={[0.06, 10, 10]} />
+        <meshBasicMaterial color="#3b2142" />
+      </instancedMesh>
+      <instancedMesh ref={candyMouthRef} args={[null, null, MAX_ENEMY_INSTANCES]}>
+        <boxGeometry args={[0.17, 0.04, 0.035]} />
+        <meshBasicMaterial color="#3b2142" />
       </instancedMesh>
 
-      {/* Boss Enemies: Giant golden sphere-torus knot */}
-      <instancedMesh ref={bossMeshRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow receiveShadow>
-        <torusKnotGeometry args={[0.4, 0.15, 64, 8]} />
+      {/* Jelly kings */}
+      <instancedMesh ref={jellyBodyRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow receiveShadow>
+        <sphereGeometry args={[0.68, 24, 20]} />
         <meshStandardMaterial
-          color="#ffd000"
-          roughness={0.15}
-          metalness={0.9}
-          emissive="#ff8a00"
-          emissiveIntensity={0.1}
+          color="#a86cf3"
+          roughness={0.28}
+          transparent
+          opacity={0.88}
+          emissive="#7c3aed"
+          emissiveIntensity={0.08}
         />
       </instancedMesh>
+      <instancedMesh ref={jellySkirtRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow>
+        <cylinderGeometry args={[0.64, 0.78, 0.3, 18]} />
+        <meshStandardMaterial color="#8f55d4" roughness={0.35} transparent opacity={0.9} />
+      </instancedMesh>
+      <instancedMesh ref={jellyCrownRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow>
+        <coneGeometry args={[0.38, 0.5, 5]} />
+        <meshStandardMaterial color="#ffd166" roughness={0.35} emissive="#ffb703" emissiveIntensity={0.12} />
+      </instancedMesh>
+      <instancedMesh ref={jellyEyeRef} args={[null, null, MAX_BOSS_EYE_INSTANCES]}>
+        <sphereGeometry args={[0.075, 12, 12]} />
+        <meshBasicMaterial color="#34234a" />
+      </instancedMesh>
+      <instancedMesh ref={jellyMouthRef} args={[null, null, MAX_BOSS_INSTANCES]}>
+        <boxGeometry args={[0.2, 0.05, 0.04]} />
+        <meshBasicMaterial color="#34234a" />
+      </instancedMesh>
 
-      {/* Health Bar Backgrounds (Red) */}
-      <instancedMesh ref={hpBgMeshRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
+      {/* Friendly health bars */}
+      <instancedMesh ref={hpBackgroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#ff0044" />
+        <meshBasicMaterial color="#4b5563" />
       </instancedMesh>
-
-      {/* Health Bar Foregrounds (Green) */}
-      <instancedMesh ref={hpFgMeshRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
+      <instancedMesh ref={hpForegroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#39ff14" />
+        <meshBasicMaterial color="#6ee7b7" />
       </instancedMesh>
     </group>
   );
