@@ -7,6 +7,8 @@ All notable changes to this project are recorded in this file.
 ### Added
 
 - Added repository-level `AGENTS.md` instructions with layered implementation, mandatory visual validation, regression checks, and completion criteria.
+- Added GitHub Actions validation for pull requests and `main` pushes.
+- Added a reusable English-only product and documentation check.
 
 ## [1.4.0] - 2026-07-15
 

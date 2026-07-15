@@ -1,5 +1,7 @@
 # Tower Defense 3D
 
+[![CI](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml)
+
 A browser-based 3D tower defense game built with React, Three.js, React Three Fiber, and Zustand. The project is being developed in small, reviewable phases toward a child-friendly tooth-defense theme.
 
 ## Current Status
@@ -39,6 +41,15 @@ npm run preview
 
 The production files are generated in `dist/`, which is intentionally excluded from Git.
 
+## Automated Checks
+
+```powershell
+npm run check:english
+npm run build
+```
+
+GitHub Actions runs the English-only policy check, commit whitespace validation, and production build for every pull request targeting `main` and every push to `main`.
+
 ## Game Controls
 
 - Select a tower from the bottom shop.
@@ -64,6 +75,10 @@ src/
   App.jsx                  Screen and overlay state
   gameStore.js             Game rules, entities, and Zustand state
   index.css                Global UI styles
+scripts/
+  check-english.mjs        English-only product and documentation check
+.github/workflows/
+  ci.yml                   Pull request and main-branch validation
 ```
 
 `standalone_demo.html` is a legacy self-contained demo. The Vite/React application under `src/` is the primary implementation and receives new gameplay features first.
