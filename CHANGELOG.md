@@ -4,6 +4,10 @@ All notable changes to this project are recorded in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added a phase implementation guide with risk analysis, layered delivery, visual validation, regression checks, and pull request completion criteria.
+
 ### Planned
 
 - Replace cyber turrets with healthy-food defenders.

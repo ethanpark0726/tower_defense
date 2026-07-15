@@ -12,6 +12,8 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
+See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for the required implementation, visual validation, and pull request workflow for future phases.
+
 ## Requirements
 
 - Node.js LTS
@@ -70,6 +72,7 @@ src/
 - Feature branches use `agent/<phase-or-feature>` names.
 - Each phase is delivered through a focused pull request.
 - Build and browser smoke tests are completed before merging.
+- Visual features require direct screenshot or browser inspection; state changes alone are not sufficient evidence.
 - User-facing changes are recorded in `CHANGELOG.md`.
 
 ## Technology
