@@ -1,11 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import GameCanvas from './components/GameCanvas';
 import GameHUD from './components/GameHUD';
+import SoundFeedback from './components/SoundFeedback';
 import { useGameStore } from './gameStore';
-import { Play, RotateCcw, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Play, RotateCcw, AlertTriangle, ShieldCheck, Heart, Sparkles } from 'lucide-react';
+
+function CelebrationEffects() {
+  const lastWaveReward = useGameStore((state) => state.lastWaveReward);
+  const gameStatus = useGameStore((state) => state.gameStatus);
+
+  useEffect(() => {
+    if (!lastWaveReward) return;
+    confetti({
+      particleCount: 70,
+      spread: 65,
+      startVelocity: 28,
+      origin: { y: 0.72 },
+      colors: ['#f97316', '#45b649', '#7bdff2', '#ffd166', '#ff7bac']
+    });
+  }, [lastWaveReward]);
+
+  useEffect(() => {
+    if (gameStatus !== 'victory') return;
+    confetti({ particleCount: 130, spread: 100, origin: { x: 0.25, y: 0.65 } });
+    confetti({ particleCount: 130, spread: 100, origin: { x: 0.75, y: 0.65 } });
+  }, [gameStatus]);
+
+  return null;
+}
 
 export default function App() {
-  const { gameStatus, startGame, resetGame, lives, gold, wave, waveActive, startWave, performanceMode } = useGameStore();
+  const { gameStatus, startGame, resetGame, wave, performanceMode } = useGameStore();
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -15,6 +41,9 @@ export default function App() {
 
       {/* In-Game HUD overlay */}
       {gameStatus === 'playing' && <GameHUD />}
+
+      <SoundFeedback />
+      <CelebrationEffects />
 
       {/* Performance Warning Badge */}
       {performanceMode === 'low' && gameStatus === 'playing' && (
@@ -28,17 +57,26 @@ export default function App() {
       {gameStatus === 'menu' && (
         <div className="screen-overlay">
           <div className="glass-panel modal-card start-menu">
-            <h1 className="brand-title">CYBER DEFENSE</h1>
-            <p className="brand-subtitle font-cyber">3D Hyper Tactical Tower Defense</p>
+            <div className="menu-icon" aria-hidden="true">
+              <Heart size={34} fill="currentColor" />
+            </div>
+            <h1 className="brand-title">TOOTH GUARDIANS</h1>
+            <p className="brand-subtitle">Healthy Food Tower Defense</p>
             
             <p className="modal-desc">
-              A fast and approachable 3D tower defense game for young players!<br />
-              Build turrets on the grid and protect the portal from incoming space monsters.
+              Team up with healthy foods and protect the friendly tooth<br />
+              from chocolate, candy, and jelly snacks!
             </p>
+
+            <div className="menu-team-preview" aria-label="Healthy defenders versus sweet snacks">
+              <span className="team-chip defenders">Carrot · Broccoli · Milk</span>
+              <span className="team-versus">VS</span>
+              <span className="team-chip snacks">Chocolate · Candy · Jelly</span>
+            </div>
             
             <button className="control-btn interactive" onClick={startGame}>
               <Play size={20} fill="#fff" />
-              Start Game
+              Guard the Tooth
             </button>
           </div>
         </div>
@@ -48,13 +86,13 @@ export default function App() {
       {gameStatus === 'gameover' && (
         <div className="screen-overlay">
           <div className="glass-panel modal-card">
-            <h1 className="modal-title glow-magenta" style={{ color: 'var(--neon-magenta)' }}>SYSTEM DEFEATED</h1>
+            <h1 className="modal-title" style={{ color: 'var(--berry)' }}>THE TOOTH NEEDS HELP</h1>
             <p className="modal-desc">
-              The energy barrier collapsed and the monsters reached the portal.<br />
-              Final result: <strong>Wave {wave}</strong>
+              The snacks slipped through this time, but every great guardian learns!<br />
+              You protected the tooth through <strong>Wave {wave}</strong>.
             </p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-              <button className="control-btn interactive" style={{ background: 'linear-gradient(135deg, var(--neon-magenta), var(--neon-purple))' }} onClick={startGame}>
+              <button className="control-btn interactive" onClick={startGame}>
                 <RotateCcw size={18} />
                 Try Again
               </button>
@@ -70,15 +108,16 @@ export default function App() {
       {gameStatus === 'victory' && (
         <div className="screen-overlay">
           <div className="glass-panel modal-card">
-            <h1 className="modal-title glow-green" style={{ color: 'var(--neon-green)' }}>VICTORY ACHIEVED</h1>
+            <div className="menu-icon victory-icon" aria-hidden="true"><Sparkles size={34} /></div>
+            <h1 className="modal-title" style={{ color: 'var(--leaf-green)' }}>BRIGHT SMILE SAVED!</h1>
             <p className="modal-desc">
-              Mission complete! The portal is secure<br />
-              and every alien threat has been cleared.
+              Amazing teamwork! The friendly tooth is healthy,<br />
+              happy, and safe from every sweet snack.
             </p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-              <button className="control-btn interactive" style={{ background: 'linear-gradient(135deg, var(--neon-green), var(--neon-cyan))' }} onClick={resetGame}>
+              <button className="control-btn interactive" onClick={resetGame}>
                 <ShieldCheck size={18} />
-                Finish
+                Back to Menu
               </button>
             </div>
           </div>

@@ -8,9 +8,22 @@ All notable changes to this project are recorded in this file.
 
 - Added repository-level `AGENTS.md` instructions with layered implementation, mandatory visual validation, regression checks, and completion criteria.
 
-### Planned
+## [1.4.0] - 2026-07-15
 
-- Redesign the HUD and tutorials for younger players.
+### Added
+
+- Added a four-step guided tutorial covering defender selection, placement, wave start, and automatic attacks.
+- Added generated Web Audio cues for placement, upgrades, sales, waves, tooth damage, victory, and game over.
+- Added an accessible sound toggle that keeps the player in control of audio feedback.
+- Added one-time wave-clear bonuses, a readable reward banner, and colorful confetti celebrations.
+
+### Changed
+
+- Replaced the remaining cyber-defense menu and HUD language with the Tooth Guardians theme.
+- Renamed the main counters to Smile Coins, Tooth Health, and Snack Patrol.
+- Updated the menu and game-over messages with friendly, encouraging language for younger players.
+- Converted defender shop choices to semantic buttons with selected and disabled states.
+- Moved the low-performance notice away from the primary wave controls.
 
 ## [1.3.0] - 2026-07-14
 

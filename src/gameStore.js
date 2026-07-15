@@ -121,6 +121,10 @@ const getEnemyStatsForWave = (wave, type) => {
   };
 };
 
+let feedbackSequence = 0;
+const createFeedbackEvent = (type) => ({ id: ++feedbackSequence, type });
+const getWaveClearBonus = (wave) => 50 + wave * 10;
+
 export const useGameStore = create((set, get) => ({
   // Game state variables
   gold: 400,
@@ -128,6 +132,9 @@ export const useGameStore = create((set, get) => ({
   wave: 0,
   waveActive: false,
   gameStatus: 'menu', // menu | playing | gameover | victory
+  soundEnabled: true,
+  feedbackEvent: null,
+  lastWaveReward: null,
   
   towers: [],
   enemies: [],
@@ -137,10 +144,35 @@ export const useGameStore = create((set, get) => ({
   performanceMode: 'high', // high | low (automatically determined by fps monitoring)
   
   setPerformanceMode: (mode) => set({ performanceMode: mode }),
+
+  toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
   
-  startGame: () => set({ gameStatus: 'playing', gold: 400, lives: 20, wave: 0, towers: [], enemies: [], waveActive: false, selectedPlacedTowerId: null }),
+  startGame: () => set({
+    gameStatus: 'playing',
+    gold: 400,
+    lives: 20,
+    wave: 0,
+    towers: [],
+    enemies: [],
+    waveActive: false,
+    selectedTowerToBuild: null,
+    selectedPlacedTowerId: null,
+    lastWaveReward: null,
+    feedbackEvent: createFeedbackEvent('startGame')
+  }),
   
-  resetGame: () => set({ gameStatus: 'menu', gold: 400, lives: 20, wave: 0, towers: [], enemies: [], waveActive: false, selectedPlacedTowerId: null }),
+  resetGame: () => set({
+    gameStatus: 'menu',
+    gold: 400,
+    lives: 20,
+    wave: 0,
+    towers: [],
+    enemies: [],
+    waveActive: false,
+    selectedTowerToBuild: null,
+    selectedPlacedTowerId: null,
+    lastWaveReward: null
+  }),
 
   selectTowerToBuild: (type) => set({ 
     selectedTowerToBuild: type,
@@ -177,7 +209,8 @@ export const useGameStore = create((set, get) => ({
     set((state) => ({
       gold: state.gold - cost,
       towers: [...state.towers, newTower],
-      selectedTowerToBuild: null
+      selectedTowerToBuild: null,
+      feedbackEvent: createFeedbackEvent('placeTower')
     }));
     return true;
   },
@@ -193,6 +226,7 @@ export const useGameStore = create((set, get) => ({
     
     set((state) => ({
       gold: state.gold - cost,
+      feedbackEvent: createFeedbackEvent('upgradeTower'),
       towers: state.towers.map(t => {
         if (t.id === id) {
           const nextLevel = t.level + 1;
@@ -223,7 +257,8 @@ export const useGameStore = create((set, get) => ({
     set((state) => ({
       gold: state.gold + refund,
       towers: state.towers.filter(t => t.id !== id),
-      selectedPlacedTowerId: null
+      selectedPlacedTowerId: null,
+      feedbackEvent: createFeedbackEvent('sellTower')
     }));
   },
   
@@ -234,7 +269,7 @@ export const useGameStore = create((set, get) => ({
     
     // Check for Victory (let's say 10 waves total)
     if (nextWave > 10) {
-      set({ gameStatus: 'victory' });
+      set({ gameStatus: 'victory', feedbackEvent: createFeedbackEvent('victory') });
       return;
     }
     
@@ -296,7 +331,9 @@ export const useGameStore = create((set, get) => ({
     set({
       wave: nextWave,
       waveActive: true,
-      enemies: enemyList
+      enemies: enemyList,
+      lastWaveReward: null,
+      feedbackEvent: createFeedbackEvent('startWave')
     });
   },
   
@@ -316,11 +353,22 @@ export const useGameStore = create((set, get) => ({
       // Check if wave finished
       const activeCount = updatedEnemies.filter(e => !e.dead && !e.reachedEnd).length;
       const isWaveDone = activeCount === 0;
+      const waveJustCompleted = state.waveActive && isWaveDone;
+      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave) : 0;
+      const feedbackType = waveJustCompleted
+        ? 'waveComplete'
+        : earnedGold > 0
+          ? 'enemyDefeated'
+          : null;
       
       return {
         enemies: updatedEnemies,
-        gold: state.gold + earnedGold,
-        waveActive: !isWaveDone
+        gold: state.gold + earnedGold + clearBonus,
+        waveActive: !isWaveDone,
+        ...(waveJustCompleted && {
+          lastWaveReward: { id: `${state.wave}-${Date.now()}`, wave: state.wave, bonus: clearBonus }
+        }),
+        ...(feedbackType && { feedbackEvent: createFeedbackEvent(feedbackType) })
       };
     });
   },
@@ -342,12 +390,20 @@ export const useGameStore = create((set, get) => ({
       
       const activeCount = updatedEnemies.filter(e => !e.dead && !e.reachedEnd).length;
       const isWaveDone = activeCount === 0;
+      const waveJustCompleted = !isGameOver && state.waveActive && isWaveDone;
+      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave) : 0;
+      const feedbackType = isGameOver ? 'gameOver' : waveJustCompleted ? 'waveComplete' : 'toothHit';
       
       return {
         lives: newLives,
         gameStatus: isGameOver ? 'gameover' : state.gameStatus,
         enemies: updatedEnemies,
-        waveActive: !isGameOver && !isWaveDone
+        waveActive: !isGameOver && !isWaveDone,
+        gold: state.gold + clearBonus,
+        feedbackEvent: createFeedbackEvent(feedbackType),
+        ...(waveJustCompleted && {
+          lastWaveReward: { id: `${state.wave}-${Date.now()}`, wave: state.wave, bonus: clearBonus }
+        })
       };
     });
   }
