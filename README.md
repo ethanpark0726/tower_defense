@@ -7,7 +7,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 1: English UI and game-loop stabilization - complete
 - Phase 2: visible route and tooth-defense map foundation - complete
 - Phase 3: chocolate, candy, and jelly enemies - complete
-- Phase 4: healthy-food defense towers - planned
+- Phase 4: healthy-food defense towers - complete
 - Phase 5: child-friendly HUD, tutorial, sound, and rewards - planned
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
@@ -56,9 +56,9 @@ src/
     GameBoard.jsx          Board, path, placement, and objectives
     GameCanvas.jsx         Three.js canvas, lighting, and effects
     GameHUD.jsx            Menus, statistics, and tower controls
-    ParticleSystem.jsx     Impact particle pool
-    ProjectileSystem.jsx   Projectile pool and damage delivery
-    TowerManager.jsx       Tower targeting and 3D models
+    ParticleSystem.jsx     Food-impact particle pool
+    ProjectileSystem.jsx   Themed projectile pool and damage delivery
+    TowerManager.jsx       Healthy-food tower targeting and 3D models
   App.jsx                  Screen and overlay state
   gameStore.js             Game rules, entities, and Zustand state
   index.css                Global UI styles

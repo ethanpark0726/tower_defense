@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGameStore, TOWER_TYPES } from '../gameStore';
-import { Coins, Heart, Swords, Shield, Zap, Sparkles, ArrowUpCircle, Trash2 } from 'lucide-react';
+import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2 } from 'lucide-react';
 
 export default function GameHUD() {
   const {
@@ -23,9 +23,9 @@ export default function GameHUD() {
   // Helper: Find icon for tower type
   const getTowerIcon = (type, size = 20) => {
     switch (type) {
-      case 'laser': return <Zap size={size} color="var(--neon-cyan)" />;
-      case 'cannon': return <Swords size={size} color="var(--neon-magenta)" />;
-      case 'tesla': return <Sparkles size={size} color="var(--neon-purple)" />;
+      case 'laser': return <Carrot size={size} color={TOWER_TYPES.laser.color} />;
+      case 'cannon': return <Sprout size={size} color={TOWER_TYPES.cannon.color} />;
+      case 'tesla': return <Milk size={size} color={TOWER_TYPES.tesla.color} />;
       default: return null;
     }
   };
@@ -92,13 +92,13 @@ export default function GameHUD() {
         {/* Helper instruction tooltip for kids */}
         {!selectedTowerToBuild && towers.length === 0 && (
           <div className="tutorial-tooltip font-cyber glow-cyan">
-            👈 Choose a turret and place it on the grid!
+            Choose a healthy defender and place it on the grid!
           </div>
         )}
         
         {selectedTowerToBuild && (
           <div className="tutorial-tooltip font-cyber" style={{ borderStyle: 'solid', color: 'var(--neon-green)', borderColor: 'var(--neon-green)' }}>
-            Click an empty grid tile to place the turret!
+            Click an empty grid tile to place the healthy defender!
           </div>
         )}
 
