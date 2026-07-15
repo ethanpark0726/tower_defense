@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as THREE from 'three';
 import {
   useGameStore,
   GRID_CELL_SIZE,
@@ -11,6 +12,27 @@ import {
 const PATH_WIDTH = GRID_CELL_SIZE * 0.9;
 const PATH_BORDER_WIDTH = PATH_WIDTH + 0.34;
 const disableRaycast = () => null;
+
+const createRoundedRectangle = (width, height, radius) => {
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  const shape = new THREE.Shape();
+  shape.moveTo(-halfWidth + radius, -halfHeight);
+  shape.lineTo(halfWidth - radius, -halfHeight);
+  shape.quadraticCurveTo(halfWidth, -halfHeight, halfWidth, -halfHeight + radius);
+  shape.lineTo(halfWidth, halfHeight - radius);
+  shape.quadraticCurveTo(halfWidth, halfHeight, halfWidth - radius, halfHeight);
+  shape.lineTo(-halfWidth + radius, halfHeight);
+  shape.quadraticCurveTo(-halfWidth, halfHeight, -halfWidth, halfHeight - radius);
+  shape.lineTo(-halfWidth, -halfHeight + radius);
+  shape.quadraticCurveTo(-halfWidth, -halfHeight, -halfWidth + radius, -halfHeight);
+  shape.closePath();
+  return shape;
+};
+
+const MOUTH_CAVITY_SHAPE = createRoundedRectangle(27, 23, 6);
+const TONGUE_SHAPE = createRoundedRectangle(24, 21, 5);
+const TOOTH_ROW_X = [-8, -6, -4, -2, 0, 2, 4, 6, 8];
 
 const PATH_SEGMENTS = WAYPOINTS.slice(0, -1).map((start, index) => {
   const end = WAYPOINTS[index + 1];
@@ -106,6 +128,79 @@ function ToothGoal() {
   );
 }
 
+function DecorativeTooth({ x, z, front, index }) {
+  const toothScale = index === 4 ? 1.12 : 0.9 + (index % 2) * 0.08;
+
+  return (
+    <group
+      position={[x, 0.18, z]}
+      rotation={[0, front ? Math.PI : 0, (index - 4) * 0.018]}
+      scale={toothScale}
+    >
+      <mesh position={[0, 0.58, 0]} scale={[0.62, 0.7, 0.48]} castShadow raycast={disableRaycast}>
+        <sphereGeometry args={[0.78, 18, 18]} />
+        <meshStandardMaterial color="#fffaf0" roughness={0.32} emissive="#fff4cf" emissiveIntensity={0.04} />
+      </mesh>
+      <mesh position={[-0.22, 0.05, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
+        <coneGeometry args={[0.23, 0.7, 14]} />
+        <meshStandardMaterial color="#fffaf0" roughness={0.36} />
+      </mesh>
+      <mesh position={[0.22, 0.05, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
+        <coneGeometry args={[0.23, 0.7, 14]} />
+        <meshStandardMaterial color="#fffaf0" roughness={0.36} />
+      </mesh>
+    </group>
+  );
+}
+
+function MouthEnvironment() {
+  return (
+    <group>
+      <mesh position={[0, -0.42, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow raycast={disableRaycast}>
+        <shapeGeometry args={[MOUTH_CAVITY_SHAPE]} />
+        <meshStandardMaterial color="#6f233d" roughness={0.88} />
+      </mesh>
+
+      <mesh
+        position={[0, -0.22, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[1.28, 1, 0.72]}
+        receiveShadow
+        raycast={disableRaycast}
+      >
+        <torusGeometry args={[9.65, 1.05, 20, 96]} />
+        <meshStandardMaterial color="#e84f72" roughness={0.5} emissive="#a71645" emissiveIntensity={0.06} />
+      </mesh>
+
+      <mesh position={[0, -0.38, 0.35]} scale={[10.8, 0.22, 8.4]} receiveShadow raycast={disableRaycast}>
+        <sphereGeometry args={[1, 40, 28]} />
+        <meshStandardMaterial color="#e97b8d" roughness={0.78} />
+      </mesh>
+
+      <mesh position={[0, 0.02, -9.55]} scale={[9.2, 0.58, 1.08]} receiveShadow raycast={disableRaycast}>
+        <sphereGeometry args={[1, 32, 18]} />
+        <meshStandardMaterial color="#f27c94" roughness={0.72} />
+      </mesh>
+      <mesh position={[0, 0.02, 9.55]} scale={[9.2, 0.58, 1.08]} receiveShadow raycast={disableRaycast}>
+        <sphereGeometry args={[1, 32, 18]} />
+        <meshStandardMaterial color="#f27c94" roughness={0.72} />
+      </mesh>
+
+      {TOOTH_ROW_X.map((x, index) => (
+        <DecorativeTooth key={`upper_tooth_${x}`} x={x} z={-9.45} index={index} front={false} />
+      ))}
+      {TOOTH_ROW_X.map((x, index) => (
+        <DecorativeTooth key={`lower_tooth_${x}`} x={x} z={9.45} index={index} front />
+      ))}
+
+      <mesh position={[0, 0.025, 1.2]} raycast={disableRaycast}>
+        <boxGeometry args={[0.1, 0.035, 4.2]} />
+        <meshBasicMaterial color="#c85570" transparent opacity={0.48} />
+      </mesh>
+    </group>
+  );
+}
+
 export default function GameBoard() {
   const { 
     selectedTowerToBuild, 
@@ -172,7 +267,9 @@ export default function GameBoard() {
 
   return (
     <group>
-      {/* Bright mint playfield */}
+      <MouthEnvironment />
+
+      {/* Rounded tongue playfield keeps the original placement surface */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
@@ -181,9 +278,9 @@ export default function GameBoard() {
         onPointerOut={handlePointerOut}
         onPointerDown={handlePointerDown}
       >
-        <planeGeometry args={[GRID_WIDTH * GRID_CELL_SIZE + 2, GRID_HEIGHT * GRID_CELL_SIZE + 2]} />
+        <shapeGeometry args={[TONGUE_SHAPE]} />
         <meshStandardMaterial
-          color="#66b9a8"
+          color="#d96b80"
           roughness={0.82}
           metalness={0.02}
         />
@@ -191,7 +288,7 @@ export default function GameBoard() {
 
       {/* Grid Lines Overlay */}
       <gridHelper
-        args={[GRID_WIDTH * GRID_CELL_SIZE, GRID_WIDTH, '#f8fff4', '#4d9d8d']}
+        args={[GRID_WIDTH * GRID_CELL_SIZE, GRID_WIDTH, '#ffe7ec', '#b84c65']}
         position={[0, 0.01, 0]}
       />
 
@@ -232,16 +329,6 @@ export default function GameBoard() {
           </mesh>
         </group>
       ))}
-
-      {/* Decorative borders for the map */}
-      <mesh position={[0, 0.1, halfHeight + 1.1]}>
-        <boxGeometry args={[halfWidth * 2 + 4, 0.2, 0.2]} />
-        <meshStandardMaterial color="#ff8fab" roughness={0.55} emissive="#ff8fab" emissiveIntensity={0.12} />
-      </mesh>
-      <mesh position={[0, 0.1, -halfHeight - 1.1]}>
-        <boxGeometry args={[halfWidth * 2 + 4, 0.2, 0.2]} />
-        <meshStandardMaterial color="#7bdff2" roughness={0.55} emissive="#7bdff2" emissiveIntensity={0.12} />
-      </mesh>
 
       <CandyGate />
       <ToothGoal />
