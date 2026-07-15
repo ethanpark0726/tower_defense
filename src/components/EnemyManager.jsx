@@ -529,47 +529,47 @@ export default function EnemyManager() {
   return (
     <group>
       {/* Chocolate blocks */}
-      <instancedMesh ref={chocolateBodyRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
+      <instancedMesh ref={chocolateBodyRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow frustumCulled={false}>
         <boxGeometry args={[0.92, 0.72, 0.46]} />
         <meshStandardMaterial color="#70402b" roughness={0.72} />
       </instancedMesh>
-      <instancedMesh ref={chocolatePanelRef} args={[null, null, MAX_CHOCOLATE_PANEL_INSTANCES]} castShadow>
+      <instancedMesh ref={chocolatePanelRef} args={[null, null, MAX_CHOCOLATE_PANEL_INSTANCES]} castShadow frustumCulled={false}>
         <boxGeometry args={[0.31, 0.23, 0.055]} />
         <meshStandardMaterial color="#9a5d3d" roughness={0.65} />
       </instancedMesh>
-      <instancedMesh ref={chocolateEyeRef} args={[null, null, MAX_STANDARD_EYE_INSTANCES]}>
+      <instancedMesh ref={chocolateEyeRef} args={[null, null, MAX_STANDARD_EYE_INSTANCES]} frustumCulled={false}>
         <sphereGeometry args={[0.065, 10, 10]} />
         <meshBasicMaterial color="#281912" />
       </instancedMesh>
-      <instancedMesh ref={chocolateMouthRef} args={[null, null, MAX_ENEMY_INSTANCES]}>
+      <instancedMesh ref={chocolateMouthRef} args={[null, null, MAX_ENEMY_INSTANCES]} frustumCulled={false}>
         <boxGeometry args={[0.18, 0.045, 0.04]} />
         <meshBasicMaterial color="#281912" />
       </instancedMesh>
 
       {/* Wrapped candies */}
-      <instancedMesh ref={candyBodyRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow>
+      <instancedMesh ref={candyBodyRef} args={[null, null, MAX_ENEMY_INSTANCES]} castShadow receiveShadow frustumCulled={false}>
         <sphereGeometry args={[0.5, 18, 18]} />
         <meshStandardMaterial color="#ff5d8f" roughness={0.35} emissive="#ff5d8f" emissiveIntensity={0.08} />
       </instancedMesh>
-      <instancedMesh ref={candyWrapperRef} args={[null, null, MAX_CANDY_WRAPPER_INSTANCES]} castShadow>
+      <instancedMesh ref={candyWrapperRef} args={[null, null, MAX_CANDY_WRAPPER_INSTANCES]} castShadow frustumCulled={false}>
         <coneGeometry args={[0.29, 0.46, 4]} />
         <meshStandardMaterial color="#ffd166" roughness={0.5} />
       </instancedMesh>
-      <instancedMesh ref={candyStripeRef} args={[null, null, MAX_ENEMY_INSTANCES]}>
+      <instancedMesh ref={candyStripeRef} args={[null, null, MAX_ENEMY_INSTANCES]} frustumCulled={false}>
         <torusGeometry args={[0.34, 0.055, 8, 20]} />
         <meshStandardMaterial color="#fff4d6" roughness={0.4} />
       </instancedMesh>
-      <instancedMesh ref={candyEyeRef} args={[null, null, MAX_STANDARD_EYE_INSTANCES]}>
+      <instancedMesh ref={candyEyeRef} args={[null, null, MAX_STANDARD_EYE_INSTANCES]} frustumCulled={false}>
         <sphereGeometry args={[0.06, 10, 10]} />
         <meshBasicMaterial color="#3b2142" />
       </instancedMesh>
-      <instancedMesh ref={candyMouthRef} args={[null, null, MAX_ENEMY_INSTANCES]}>
+      <instancedMesh ref={candyMouthRef} args={[null, null, MAX_ENEMY_INSTANCES]} frustumCulled={false}>
         <boxGeometry args={[0.17, 0.04, 0.035]} />
         <meshBasicMaterial color="#3b2142" />
       </instancedMesh>
 
       {/* Jelly kings */}
-      <instancedMesh ref={jellyBodyRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow receiveShadow>
+      <instancedMesh ref={jellyBodyRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow receiveShadow frustumCulled={false}>
         <sphereGeometry args={[0.68, 24, 20]} />
         <meshStandardMaterial
           color="#a86cf3"
@@ -580,29 +580,29 @@ export default function EnemyManager() {
           emissiveIntensity={0.08}
         />
       </instancedMesh>
-      <instancedMesh ref={jellySkirtRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow>
+      <instancedMesh ref={jellySkirtRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow frustumCulled={false}>
         <cylinderGeometry args={[0.64, 0.78, 0.3, 18]} />
         <meshStandardMaterial color="#8f55d4" roughness={0.35} transparent opacity={0.9} />
       </instancedMesh>
-      <instancedMesh ref={jellyCrownRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow>
+      <instancedMesh ref={jellyCrownRef} args={[null, null, MAX_BOSS_INSTANCES]} castShadow frustumCulled={false}>
         <coneGeometry args={[0.38, 0.5, 5]} />
         <meshStandardMaterial color="#ffd166" roughness={0.35} emissive="#ffb703" emissiveIntensity={0.12} />
       </instancedMesh>
-      <instancedMesh ref={jellyEyeRef} args={[null, null, MAX_BOSS_EYE_INSTANCES]}>
+      <instancedMesh ref={jellyEyeRef} args={[null, null, MAX_BOSS_EYE_INSTANCES]} frustumCulled={false}>
         <sphereGeometry args={[0.075, 12, 12]} />
         <meshBasicMaterial color="#34234a" />
       </instancedMesh>
-      <instancedMesh ref={jellyMouthRef} args={[null, null, MAX_BOSS_INSTANCES]}>
+      <instancedMesh ref={jellyMouthRef} args={[null, null, MAX_BOSS_INSTANCES]} frustumCulled={false}>
         <boxGeometry args={[0.2, 0.05, 0.04]} />
         <meshBasicMaterial color="#34234a" />
       </instancedMesh>
 
       {/* Friendly health bars */}
-      <instancedMesh ref={hpBackgroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
+      <instancedMesh ref={hpBackgroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#4b5563" />
       </instancedMesh>
-      <instancedMesh ref={hpForegroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]}>
+      <instancedMesh ref={hpForegroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#6ee7b7" />
       </instancedMesh>
