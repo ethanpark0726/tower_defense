@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, Sky } from '@react-three/drei';
 import { EffectComposer, Bloom, SSAO, SMAA } from '@react-three/postprocessing';
@@ -50,7 +50,7 @@ export default function GameCanvas() {
   return (
     <Canvas
       shadows={performanceMode === 'high'}
-      camera={{ position: [0, 14, 16], fov: 45 }}
+      camera={{ position: [0, 15, 17], fov: 45 }}
       dpr={performanceMode === 'high' ? [1, 2] : 1}
       style={{
         position: 'absolute',
@@ -58,17 +58,17 @@ export default function GameCanvas() {
         left: 0,
         width: '100%',
         height: '100%',
-        background: '#04060f'
+        background: '#b8e8ff'
       }}
       gl={{ antialias: false, powerPreference: "high-performance" }}
     >
       {/* Lights & Ambient Global Illumination */}
-      <ambientLight intensity={performanceMode === 'high' ? 0.35 : 0.6} />
+      <ambientLight intensity={performanceMode === 'high' ? 0.68 : 0.82} />
       
       <directionalLight
         castShadow={performanceMode === 'high'}
         position={[8, 18, 5]}
-        intensity={1.5}
+        intensity={1.25}
         shadow-mapSize-width={performanceMode === 'high' ? 2048 : 512}
         shadow-mapSize-height={performanceMode === 'high' ? 2048 : 512}
         shadow-camera-far={40}
@@ -79,12 +79,12 @@ export default function GameCanvas() {
         shadow-bias={-0.0005}
       />
       
-      <pointLight position={[-8, 5, -8]} intensity={0.8} color="#00f2fe" />
-      <pointLight position={[8, 5, 8]} intensity={0.8} color="#ff007f" />
+      <pointLight position={[-8, 5, -8]} intensity={0.65} color="#ffd166" />
+      <pointLight position={[8, 5, 8]} intensity={0.65} color="#ff8fab" />
 
       {/* Stylized Sky & Environment Map for PBR reflections */}
-      <Sky sunPosition={[8, 18, 5]} inclination={0.2} azimuth={0.25} distance={100} mieCoefficient={0.005} mieDirectionalG={0.8} rayleigh={2} turbid={10} />
-      <Environment preset="city" environmentIntensity={0.4} />
+      <Sky sunPosition={[8, 18, 5]} inclination={0.35} azimuth={0.25} distance={100} mieCoefficient={0.004} mieDirectionalG={0.75} rayleigh={1.6} turbid={7} />
+      <Environment preset="park" environmentIntensity={0.35} />
 
       {/* Orbit Controls with limited tilt angles (child friendly navigation) */}
       <OrbitControls
@@ -115,15 +115,15 @@ export default function GameCanvas() {
       >
         {performanceMode === 'high' && (
           <SSAO
-            intensity={1.5}
+            intensity={1.1}
             radius={0.8}
             luminanceInfluence={0.5}
-            color="#05081c"
+            color="#587589"
           />
         )}
         <Bloom
-          intensity={performanceMode === 'high' ? 1.4 : 0.8}
-          luminanceThreshold={0.2}
+          intensity={performanceMode === 'high' ? 0.75 : 0.45}
+          luminanceThreshold={0.55}
           luminanceSmoothing={0.9}
           mipmapBlur
         />
