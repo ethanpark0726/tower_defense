@@ -4,6 +4,7 @@ import { create } from 'zustand';
 export const GRID_CELL_SIZE = 2;
 export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 10;
+export const TOTAL_WAVES = 10;
 
 // Waypoints for enemies to walk along (S-Curve path)
 export const WAYPOINTS = [
@@ -101,6 +102,18 @@ export const ENEMY_TYPES = {
     size: 1.2,
     color: '#a86cf3'
   }
+};
+
+export const getWaveComposition = (wave) => {
+  if (wave < 1 || wave > TOTAL_WAVES) {
+    return { normal: 0, fast: 0, boss: 0, total: 0 };
+  }
+
+  const normal = 5 + wave * 2;
+  const fast = wave >= 3 ? 3 + wave : 0;
+  const boss = wave % 5 === 0 ? wave / 5 : 0;
+
+  return { normal, fast, boss, total: normal + fast + boss };
 };
 
 // Enemy Level Up Wave Multiplier
@@ -273,8 +286,7 @@ export const useGameStore = create((set, get) => ({
     
     const nextWave = get().wave + 1;
     
-    // Check for Victory (let's say 10 waves total)
-    if (nextWave > 10) {
+    if (nextWave > TOTAL_WAVES) {
       set({ gameStatus: 'victory', feedbackEvent: createFeedbackEvent('victory') });
       return;
     }
@@ -282,12 +294,10 @@ export const useGameStore = create((set, get) => ({
     // Create wave composition
     const enemyList = [];
     
-    // Normal, Fast, and Boss compositions
-    let normalCount = 5 + nextWave * 2;
-    let fastCount = nextWave >= 3 ? 3 + nextWave : 0;
-    let bossCount = nextWave % 5 === 0 ? nextWave / 5 : 0;
-    
-    let totalEnemies = normalCount + fastCount + bossCount;
+    const composition = getWaveComposition(nextWave);
+    let normalCount = composition.normal;
+    let fastCount = composition.fast;
+    let bossCount = composition.boss;
     
     // Spawn sequence builder
     let idCounter = 0;

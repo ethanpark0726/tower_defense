@@ -12,6 +12,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 4: healthy-food defense towers - complete
 - Phase 5: child-friendly HUD, tutorial, sound, and rewards - complete
 - Phase 6: once-per-wave Brush Blast ability - complete
+- Phase 7: data-driven next-wave snack preview - complete
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
@@ -57,6 +58,7 @@ GitHub Actions runs the English-only policy check, commit whitespace validation,
 - Click an empty grid tile to place it.
 - Click a placed tower to inspect, upgrade, or sell it.
 - Start the next wave from the top-right button.
+- Review the snack counts and strategy tip in the next-wave preview before starting.
 - Use the speaker button to turn game sounds on or off.
 - Use Brush Blast once per wave to scrub every snack currently visible on the route.
 - Drag to rotate the camera and scroll to zoom.
