@@ -6,6 +6,39 @@ export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 10;
 export const TOTAL_WAVES = 10;
 
+export const DIFFICULTIES = {
+  easy: {
+    label: 'Easy',
+    description: 'More coins and a sturdier tooth for new guardians.',
+    startingGold: 500,
+    startingLives: 25,
+    enemyHp: 0.9,
+    enemySpeed: 0.92,
+    enemyReward: 1.1,
+    spawnDelay: 1.08
+  },
+  normal: {
+    label: 'Normal',
+    description: 'A balanced patrol with quicker, tougher snacks.',
+    startingGold: 375,
+    startingLives: 20,
+    enemyHp: 1.15,
+    enemySpeed: 1.05,
+    enemyReward: 0.95,
+    spawnDelay: 0.9
+  },
+  challenge: {
+    label: 'Challenge',
+    description: 'Fewer supplies against a fast and powerful snack rush.',
+    startingGold: 300,
+    startingLives: 15,
+    enemyHp: 1.4,
+    enemySpeed: 1.15,
+    enemyReward: 0.85,
+    spawnDelay: 0.75
+  }
+};
+
 // Waypoints for enemies to walk along (S-Curve path)
 export const WAYPOINTS = [
   { x: -11, y: 0.25, z: 3 },
@@ -117,17 +150,18 @@ export const getWaveComposition = (wave) => {
 };
 
 // Enemy Level Up Wave Multiplier
-const getEnemyStatsForWave = (wave, type) => {
+export const getEnemyStatsForWave = (wave, type, difficulty = 'normal') => {
   const typeData = ENEMY_TYPES[type] ?? ENEMY_TYPES.normal;
+  const difficultyData = DIFFICULTIES[difficulty] ?? DIFFICULTIES.normal;
   const hpMultiplier = Math.pow(1.3, wave - 1);
   const rewardMultiplier = Math.pow(1.1, wave - 1);
-  const hp = Math.round(typeData.baseHp * hpMultiplier);
+  const hp = Math.round(typeData.baseHp * hpMultiplier * difficultyData.enemyHp);
 
   return {
     hp,
     maxHp: hp,
-    speed: typeData.speed,
-    reward: Math.round(typeData.baseReward * rewardMultiplier),
+    speed: typeData.speed * difficultyData.enemySpeed,
+    reward: Math.round(typeData.baseReward * rewardMultiplier * difficultyData.enemyReward),
     size: typeData.size,
     color: typeData.color,
     theme: typeData.theme
@@ -136,15 +170,16 @@ const getEnemyStatsForWave = (wave, type) => {
 
 let feedbackSequence = 0;
 const createFeedbackEvent = (type) => ({ id: ++feedbackSequence, type });
-const getWaveClearBonus = (wave) => 50 + wave * 10;
+const getWaveClearBonus = (wave, difficulty) => Math.round((50 + wave * 10) * DIFFICULTIES[difficulty].enemyReward);
 
 export const useGameStore = create((set, get) => ({
   // Game state variables
-  gold: 400,
-  lives: 20,
+  gold: DIFFICULTIES.normal.startingGold,
+  lives: DIFFICULTIES.normal.startingLives,
   wave: 0,
   waveActive: false,
   gameStatus: 'menu', // menu | playing | gameover | victory
+  difficulty: 'normal',
   soundEnabled: true,
   feedbackEvent: null,
   lastWaveReward: null,
@@ -161,11 +196,14 @@ export const useGameStore = create((set, get) => ({
   setPerformanceMode: (mode) => set({ performanceMode: mode }),
 
   toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+  setDifficulty: (difficulty) => {
+    if (DIFFICULTIES[difficulty]) set({ difficulty });
+  },
   
-  startGame: () => set({
+  startGame: () => set((state) => ({
     gameStatus: 'playing',
-    gold: 400,
-    lives: 20,
+    gold: DIFFICULTIES[state.difficulty].startingGold,
+    lives: DIFFICULTIES[state.difficulty].startingLives,
     wave: 0,
     towers: [],
     enemies: [],
@@ -176,12 +214,12 @@ export const useGameStore = create((set, get) => ({
     brushBlastUsed: false,
     brushBlastEvent: null,
     feedbackEvent: createFeedbackEvent('startGame')
-  }),
+  })),
   
   resetGame: () => set({
     gameStatus: 'menu',
-    gold: 400,
-    lives: 20,
+    gold: DIFFICULTIES.normal.startingGold,
+    lives: DIFFICULTIES.normal.startingLives,
     wave: 0,
     towers: [],
     enemies: [],
@@ -285,6 +323,8 @@ export const useGameStore = create((set, get) => ({
     if (get().waveActive) return;
     
     const nextWave = get().wave + 1;
+    const difficulty = get().difficulty;
+    const difficultyData = DIFFICULTIES[difficulty];
     
     if (nextWave > TOTAL_WAVES) {
       set({ gameStatus: 'victory', feedbackEvent: createFeedbackEvent('victory') });
@@ -308,11 +348,11 @@ export const useGameStore = create((set, get) => ({
         enemyList.push({
           id: `enemy_${nextWave}_${idCounter++}`,
           type: 'boss',
-          spawnDelay: idCounter * 2.0, // spawn slowly
+          spawnDelay: idCounter * 2.0 * difficultyData.spawnDelay,
           progress: 0,
           dead: false,
           reachedEnd: false,
-          ...getEnemyStatsForWave(nextWave, 'boss')
+          ...getEnemyStatsForWave(nextWave, 'boss', difficulty)
         });
         bossCount--;
       }
@@ -321,11 +361,11 @@ export const useGameStore = create((set, get) => ({
         enemyList.push({
           id: `enemy_${nextWave}_${idCounter++}`,
           type: 'normal',
-          spawnDelay: idCounter * 1.5,
+          spawnDelay: idCounter * 1.5 * difficultyData.spawnDelay,
           progress: 0,
           dead: false,
           reachedEnd: false,
-          ...getEnemyStatsForWave(nextWave, 'normal')
+          ...getEnemyStatsForWave(nextWave, 'normal', difficulty)
         });
         normalCount--;
       }
@@ -334,11 +374,11 @@ export const useGameStore = create((set, get) => ({
         enemyList.push({
           id: `enemy_${nextWave}_${idCounter++}`,
           type: 'fast',
-          spawnDelay: idCounter * 1.0, // spawn rapidly
+          spawnDelay: idCounter * 1.0 * difficultyData.spawnDelay,
           progress: 0,
           dead: false,
           reachedEnd: false,
-          ...getEnemyStatsForWave(nextWave, 'fast')
+          ...getEnemyStatsForWave(nextWave, 'fast', difficulty)
         });
         fastCount--;
       }
@@ -388,7 +428,7 @@ export const useGameStore = create((set, get) => ({
       const activeCount = updatedEnemies.filter((enemy) => !enemy.dead && !enemy.reachedEnd).length;
       const isWaveDone = activeCount === 0;
       const waveJustCompleted = state.waveActive && isWaveDone;
-      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave) : 0;
+      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave, state.difficulty) : 0;
       const feedbackEvent = createFeedbackEvent('brushBlast');
 
       return {
@@ -422,7 +462,7 @@ export const useGameStore = create((set, get) => ({
       const activeCount = updatedEnemies.filter(e => !e.dead && !e.reachedEnd).length;
       const isWaveDone = activeCount === 0;
       const waveJustCompleted = state.waveActive && isWaveDone;
-      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave) : 0;
+      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave, state.difficulty) : 0;
       const feedbackType = waveJustCompleted
         ? 'waveComplete'
         : earnedGold > 0
@@ -459,7 +499,7 @@ export const useGameStore = create((set, get) => ({
       const activeCount = updatedEnemies.filter(e => !e.dead && !e.reachedEnd).length;
       const isWaveDone = activeCount === 0;
       const waveJustCompleted = !isGameOver && state.waveActive && isWaveDone;
-      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave) : 0;
+      const clearBonus = waveJustCompleted ? getWaveClearBonus(state.wave, state.difficulty) : 0;
       const feedbackType = isGameOver ? 'gameOver' : waveJustCompleted ? 'waveComplete' : 'toothHit';
       
       return {

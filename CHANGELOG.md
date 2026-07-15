@@ -10,6 +10,20 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.7.0] - 2026-07-15
+
+### Added
+
+- Added Easy, Normal, and Challenge patrol choices to the main menu.
+- Added difficulty-specific starting coins, Tooth Health, enemy health, speed, rewards, spawn timing, and wave bonuses.
+- Added the active difficulty name to the in-game wave card.
+
+### Changed
+
+- Renamed the browser tab to Tooth Guardians and added English page metadata.
+- Made Normal patrol tougher than the previous default while keeping Easy welcoming for new players.
+- Increased the strategic pressure of Challenge patrol with fewer supplies, tougher snacks, and shorter spawn gaps.
+
 ## [1.6.0] - 2026-07-15
 
 ### Added
