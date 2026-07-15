@@ -10,6 +10,12 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.8.1] - 2026-07-15
+
+### Fixed
+
+- Removed the remote HDR environment dependency that could leave the 3D game blank after starting a patrol on slow or restricted networks.
+
 ## [1.8.0] - 2026-07-15
 
 ### Added
