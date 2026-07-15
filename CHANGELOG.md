@@ -6,7 +6,7 @@ All notable changes to this project are recorded in this file.
 
 ### Added
 
-- Added a phase implementation guide with risk analysis, layered delivery, visual validation, regression checks, and pull request completion criteria.
+- Added repository-level `AGENTS.md` instructions with layered implementation, mandatory visual validation, regression checks, and completion criteria.
 
 ### Planned
 

@@ -12,7 +12,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
-See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for the required implementation, visual validation, and pull request workflow for future phases.
+Repository-wide implementation and validation rules for coding agents are defined in [AGENTS.md](AGENTS.md).
 
 ## Requirements
 
