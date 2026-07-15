@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGameStore, TOWER_TYPES } from '../gameStore';
-import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2 } from 'lucide-react';
+import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star } from 'lucide-react';
 
 export default function GameHUD() {
   const {
@@ -9,6 +9,9 @@ export default function GameHUD() {
     wave,
     waveActive,
     startWave,
+    soundEnabled,
+    toggleSound,
+    lastWaveReward,
     selectedTowerToBuild,
     selectTowerToBuild,
     towers,
@@ -19,6 +22,31 @@ export default function GameHUD() {
   } = useGameStore();
 
   const selectedPlacedTower = towers.find(t => t.id === selectedPlacedTowerId);
+  const [visibleReward, setVisibleReward] = useState(null);
+
+  useEffect(() => {
+    if (!lastWaveReward) return undefined;
+    setVisibleReward(lastWaveReward);
+    const timeout = window.setTimeout(() => setVisibleReward(null), 8000);
+    return () => window.clearTimeout(timeout);
+  }, [lastWaveReward]);
+
+  const tutorial = useMemo(() => {
+    if (wave > 1) return null;
+    if (towers.length === 0 && !selectedTowerToBuild) {
+      return { step: 1, text: 'Pick a healthy food from the defender tray.' };
+    }
+    if (selectedTowerToBuild) {
+      return { step: 2, text: 'Place your defender on an empty mint tile.' };
+    }
+    if (wave === 0 && !waveActive) {
+      return { step: 3, text: 'Your team is ready! Start the first snack wave.' };
+    }
+    if (wave === 1 && waveActive) {
+      return { step: 4, text: 'Great job! Your healthy defender attacks automatically.' };
+    }
+    return null;
+  }, [selectedTowerToBuild, towers.length, wave, waveActive]);
 
   // Helper: Find icon for tower type
   const getTowerIcon = (type, size = 20) => {
@@ -39,8 +67,8 @@ export default function GameHUD() {
           <div className="glass-panel stat-card pulse-glow-cyan interactive">
             <div className="stat-icon"><Coins color="var(--neon-yellow)" fill="var(--neon-yellow)" /></div>
             <div className="stat-details">
-              <span className="stat-label">Gold Credits</span>
-              <span className="stat-value glow-yellow">{gold} G</span>
+              <span className="stat-label">Smile Coins</span>
+              <span className="stat-value glow-yellow">{gold}</span>
             </div>
           </div>
 
@@ -55,20 +83,28 @@ export default function GameHUD() {
               />
             </div>
             <div className="stat-details">
-              <span className="stat-label">Portal Barrier</span>
-              <span className="stat-value" style={{ color: lives <= 5 ? 'var(--neon-magenta)' : '#fff' }}>{lives} HP</span>
+              <span className="stat-label">Tooth Health</span>
+              <span className="stat-value" style={{ color: lives <= 5 ? 'var(--berry)' : '#fff' }}>{lives} HP</span>
             </div>
           </div>
         </div>
 
         {/* Wave Stats */}
         <div className="glass-panel wave-card interactive">
-          <span className="wave-label font-cyber">Current Threat</span>
+          <span className="wave-label">Snack Patrol</span>
           <div className="wave-number">WAVE {wave} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ 10</span></div>
         </div>
 
         {/* Next Wave Button */}
-        <div className="interactive">
+        <div className="hud-actions interactive">
+          <button
+            className="sound-btn"
+            onClick={toggleSound}
+            aria-label={soundEnabled ? 'Mute sounds' : 'Turn sounds on'}
+            title={soundEnabled ? 'Mute sounds' : 'Turn sounds on'}
+          >
+            {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          </button>
           <button 
             className="control-btn" 
             onClick={startWave} 
@@ -82,23 +118,28 @@ export default function GameHUD() {
             }}
           >
             <Swords size={18} />
-            {waveActive ? 'Defending Wave...' : 'Start Next Wave'}
+            {waveActive ? 'Protecting Tooth...' : 'Start Snack Wave'}
           </button>
         </div>
       </div>
 
+      {visibleReward && (
+        <div className="reward-banner" role="status">
+          <Star size={26} fill="currentColor" />
+          <div>
+            <strong>Wave {visibleReward.wave} cleared!</strong>
+            <span>Teamwork bonus: +{visibleReward.bonus} Smile Coins</span>
+          </div>
+        </div>
+      )}
+
       {/* 2. TOWERS SHOP & HELP INSTRUCTIONS (BOTTOM BAR) */}
       <div className="hud-bottom-bar">
         {/* Helper instruction tooltip for kids */}
-        {!selectedTowerToBuild && towers.length === 0 && (
-          <div className="tutorial-tooltip font-cyber glow-cyan">
-            Choose a healthy defender and place it on the grid!
-          </div>
-        )}
-        
-        {selectedTowerToBuild && (
-          <div className="tutorial-tooltip font-cyber" style={{ borderStyle: 'solid', color: 'var(--neon-green)', borderColor: 'var(--neon-green)' }}>
-            Click an empty grid tile to place the healthy defender!
+        {tutorial && (
+          <div className="tutorial-tooltip">
+            <span className="tutorial-step">STEP {tutorial.step} OF 4</span>
+            <span>{tutorial.text}</span>
           </div>
         )}
 
@@ -108,18 +149,21 @@ export default function GameHUD() {
             const isSelected = selectedTowerToBuild === type;
             
             return (
-              <div 
+              <button
+                type="button"
                 key={type}
                 className={`tower-item ${isSelected ? 'selected' : ''} ${!isAffordable ? 'disabled' : ''}`}
                 onClick={() => isAffordable && selectTowerToBuild(isSelected ? null : type)}
                 title={data.description}
+                aria-pressed={isSelected}
+                disabled={!isAffordable}
               >
                 <div style={{ marginTop: '4px' }}>
                   {getTowerIcon(type, 24)}
                 </div>
                 <span className="tower-name">{data.name}</span>
                 <span className="tower-cost">{data.cost}G</span>
-              </div>
+              </button>
             );
           })}
         </div>
