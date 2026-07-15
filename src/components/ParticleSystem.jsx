@@ -48,6 +48,10 @@ export default function ParticleSystem() {
         numParticles = 34;
         explosionSpeed = 5.8;
         particleColors = ['#a86cf3', '#8f55d4', '#7bdff2', '#ffd166'];
+      } else if (type === 'brush') {
+        numParticles = 28;
+        explosionSpeed = 5.2;
+        particleColors = ['#ffffff', '#d7f3ff', '#7bdff2', '#b8f2e6'];
       }
 
       // Multiply particles and speed based on tower upgrade level

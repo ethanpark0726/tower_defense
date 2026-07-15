@@ -10,6 +10,20 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.5.0] - 2026-07-15
+
+### Added
+
+- Added Brush Blast, a once-per-wave ability that damages every snack currently visible on the route.
+- Added clear charged, used, and next-wave recharge states to the Brush Blast control.
+- Added brushing bubbles, mint cleaning particles, a sweeping status card, and generated sound feedback.
+- Added a non-consuming message when Brush Blast is used before a snack appears.
+
+### Changed
+
+- Moved the active enemy position registry into a shared module so towers, projectiles, and player abilities use the same visible targets.
+- Reset Brush Blast state on new games, retries, and every wave start.
+
 ## [1.4.0] - 2026-07-15
 
 ### Added

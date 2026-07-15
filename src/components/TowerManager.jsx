@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore, TOWER_TYPES } from '../gameStore';
-import { activeEnemiesPositions } from './EnemyManager';
+import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { fireProjectile } from './ProjectileSystem';
 
 const UP_AXIS = new THREE.Vector3(0, 1, 0);

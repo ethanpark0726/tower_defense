@@ -1,13 +1,27 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 import { OrbitControls, Environment, Sky } from '@react-three/drei';
 import { EffectComposer, Bloom, SSAO, SMAA } from '@react-three/postprocessing';
 import GameBoard from './GameBoard';
 import EnemyManager from './EnemyManager';
 import TowerManager from './TowerManager';
 import ProjectileSystem from './ProjectileSystem';
-import ParticleSystem from './ParticleSystem';
+import ParticleSystem, { triggerExplosion } from './ParticleSystem';
 import { useGameStore } from '../gameStore';
+
+function BrushBlastParticles() {
+  const brushBlastEvent = useGameStore((state) => state.brushBlastEvent);
+
+  useEffect(() => {
+    if (!brushBlastEvent || brushBlastEvent.hitCount === 0 || !triggerExplosion) return;
+    brushBlastEvent.targetPositions.forEach((position) => {
+      triggerExplosion(new THREE.Vector3(...position), 'brush', 1);
+    });
+  }, [brushBlastEvent]);
+
+  return null;
+}
 
 // Dynamic Performance Controller component
 function PerformanceMonitor() {
@@ -104,6 +118,7 @@ export default function GameCanvas() {
       <TowerManager />
       <ProjectileSystem />
       <ParticleSystem />
+      <BrushBlastParticles />
 
       {/* Dynamic FPS optimizer */}
       <PerformanceMonitor />
