@@ -6,6 +6,7 @@ import {
   GRID_WIDTH,
   GRID_HEIGHT,
   WAYPOINTS,
+  getMapThemeForWave,
   isCellOnPath
 } from '../gameStore';
 
@@ -33,6 +34,53 @@ const createRoundedRectangle = (width, height, radius) => {
 const MOUTH_CAVITY_SHAPE = createRoundedRectangle(27, 23, 6);
 const TONGUE_SHAPE = createRoundedRectangle(24, 21, 5);
 const TOOTH_ROW_X = [-8, -6, -4, -2, 0, 2, 4, 6, 8];
+const MAP_DECORATIONS = {
+  gum_garden: {
+    patches: [
+      [-8, -6, 0.95],
+      [7, -6, 0.85],
+      [-7, 7, 0.78],
+      [6, 2, 0.68]
+    ],
+    sprouts: [
+      [-8.4, -6.1],
+      [-7.8, -5.55],
+      [7.35, -6.3],
+      [-6.8, 7.35],
+      [6.3, 2.3]
+    ]
+  },
+  calcium_cove: {
+    drops: [
+      [-7.5, -6.4, 0.72],
+      [6.6, -6.1, 0.56],
+      [-7.2, 7.1, 0.64],
+      [7.7, 2.1, 0.5],
+      [0, 7.4, 0.44]
+    ],
+    bubbles: [
+      [-8.9, -4.9, 0.18],
+      [8.2, -5.1, 0.14],
+      [-8.5, 5.6, 0.16],
+      [4.8, 7.3, 0.12]
+    ]
+  },
+  plaque_patrol: {
+    spots: [
+      [-8.1, -6.3, 0.62],
+      [7.3, -6.5, 0.5],
+      [-7.6, 7.3, 0.58],
+      [7.2, 1.6, 0.46],
+      [0.2, 7.2, 0.42]
+    ],
+    sparkle: [
+      [-8.2, -5.6],
+      [6.7, -6.0],
+      [-7.1, 6.7],
+      [7.6, 2.4]
+    ]
+  }
+};
 
 const PATH_SEGMENTS = WAYPOINTS.slice(0, -1).map((start, index) => {
   const end = WAYPOINTS[index + 1];
@@ -153,12 +201,12 @@ function DecorativeTooth({ x, z, front, index }) {
   );
 }
 
-function MouthEnvironment() {
+function MouthEnvironment({ theme }) {
   return (
     <group>
       <mesh position={[0, -0.42, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow raycast={disableRaycast}>
         <shapeGeometry args={[MOUTH_CAVITY_SHAPE]} />
-        <meshStandardMaterial color="#6f233d" roughness={0.88} />
+        <meshStandardMaterial color={theme.mouth} roughness={0.88} />
       </mesh>
 
       <mesh
@@ -201,8 +249,86 @@ function MouthEnvironment() {
   );
 }
 
+function GumGardenDecor({ theme }) {
+  const decor = MAP_DECORATIONS.gum_garden;
+
+  return (
+    <group>
+      {decor.patches.map(([x, z, scale]) => (
+        <mesh key={`garden_patch_${x}_${z}`} position={[x, 0.11, z]} rotation={[-Math.PI / 2, 0, 0]} scale={scale} raycast={disableRaycast}>
+          <circleGeometry args={[0.72, 28]} />
+          <meshStandardMaterial color={theme.accent} roughness={0.82} transparent opacity={0.58} />
+        </mesh>
+      ))}
+      {decor.sprouts.map(([x, z], index) => (
+        <group key={`garden_sprout_${x}_${z}`} position={[x, 0.24, z]} rotation={[0, index % 2 ? 0.35 : -0.25, 0]}>
+          <mesh position={[0, 0.16, 0]} rotation={[0, 0, 0.35]} castShadow raycast={disableRaycast}>
+            <coneGeometry args={[0.09, 0.46, 8]} />
+            <meshStandardMaterial color="#2f9e44" roughness={0.75} />
+          </mesh>
+          <mesh position={[0.1, 0.12, 0]} rotation={[0, 0, -0.45]} castShadow raycast={disableRaycast}>
+            <coneGeometry args={[0.08, 0.36, 8]} />
+            <meshStandardMaterial color="#55b938" roughness={0.75} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function CalciumCoveDecor({ theme }) {
+  const decor = MAP_DECORATIONS.calcium_cove;
+
+  return (
+    <group>
+      {decor.drops.map(([x, z, scale]) => (
+        <mesh key={`calcium_drop_${x}_${z}`} position={[x, 0.15, z]} rotation={[-Math.PI / 2, 0, 0]} scale={[scale, scale * 1.35, scale]} raycast={disableRaycast}>
+          <circleGeometry args={[0.75, 32]} />
+          <meshStandardMaterial color={theme.accent} roughness={0.42} transparent opacity={0.46} emissive={theme.accent} emissiveIntensity={0.08} />
+        </mesh>
+      ))}
+      {decor.bubbles.map(([x, z, radius]) => (
+        <mesh key={`calcium_bubble_${x}_${z}`} position={[x, 0.36, z]} castShadow raycast={disableRaycast}>
+          <sphereGeometry args={[radius, 14, 12]} />
+          <meshStandardMaterial color={theme.secondaryAccent} roughness={0.18} transparent opacity={0.72} emissive={theme.accent} emissiveIntensity={0.12} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function PlaquePatrolDecor({ theme }) {
+  const decor = MAP_DECORATIONS.plaque_patrol;
+
+  return (
+    <group>
+      {decor.spots.map(([x, z, scale]) => (
+        <mesh key={`plaque_spot_${x}_${z}`} position={[x, 0.13, z]} rotation={[-Math.PI / 2, 0, 0]} scale={[scale * 1.25, scale, scale]} raycast={disableRaycast}>
+          <circleGeometry args={[0.82, 30]} />
+          <meshStandardMaterial color={theme.accent} roughness={0.86} transparent opacity={0.34} />
+        </mesh>
+      ))}
+      {decor.sparkle.map(([x, z]) => (
+        <group key={`plaque_sparkle_${x}_${z}`} position={[x, 0.27, z]} rotation={[0, Math.PI / 4, 0]}>
+          <mesh raycast={disableRaycast}>
+            <octahedronGeometry args={[0.18, 0]} />
+            <meshStandardMaterial color={theme.secondaryAccent} roughness={0.3} emissive={theme.secondaryAccent} emissiveIntensity={0.2} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function MapDecorations({ theme }) {
+  if (theme.id === 'calcium_cove') return <CalciumCoveDecor theme={theme} />;
+  if (theme.id === 'plaque_patrol') return <PlaquePatrolDecor theme={theme} />;
+  return <GumGardenDecor theme={theme} />;
+}
+
 export default function GameBoard() {
   const { 
+    wave,
     selectedTowerToBuild, 
     placeTower, 
     towers, 
@@ -211,6 +337,7 @@ export default function GameBoard() {
   } = useGameStore();
 
   const [hoveredCell, setHoveredCell] = useState(null);
+  const mapTheme = getMapThemeForWave(wave || 1);
 
   // Compute grid borders/coordinates
   const halfWidth = (GRID_WIDTH * GRID_CELL_SIZE) / 2;
@@ -267,7 +394,7 @@ export default function GameBoard() {
 
   return (
     <group>
-      <MouthEnvironment />
+      <MouthEnvironment theme={mapTheme} />
 
       {/* Rounded tongue playfield keeps the original placement surface */}
       <mesh
@@ -280,11 +407,13 @@ export default function GameBoard() {
       >
         <shapeGeometry args={[TONGUE_SHAPE]} />
         <meshStandardMaterial
-          color="#d96b80"
+          color={mapTheme.tongue}
           roughness={0.82}
           metalness={0.02}
         />
       </mesh>
+
+      <MapDecorations theme={mapTheme} />
 
       {/* Grid Lines Overlay */}
       <gridHelper
@@ -301,15 +430,15 @@ export default function GameBoard() {
         >
           <mesh position={[0, -0.025, 0]} receiveShadow raycast={disableRaycast}>
             <boxGeometry args={[segment.length + PATH_BORDER_WIDTH, 0.08, PATH_BORDER_WIDTH]} />
-            <meshStandardMaterial color="#fff9e8" roughness={0.9} />
+            <meshStandardMaterial color={mapTheme.routeBorder} roughness={0.9} />
           </mesh>
           <mesh position={[0, 0.035, 0]} receiveShadow raycast={disableRaycast}>
             <boxGeometry args={[segment.length + PATH_WIDTH, 0.1, PATH_WIDTH]} />
             <meshStandardMaterial
-              color="#ffd6a5"
+              color={mapTheme.route}
               roughness={0.72}
               metalness={0.0}
-              emissive="#ff9eb5"
+              emissive={mapTheme.routeGlow}
               emissiveIntensity={0.08}
             />
           </mesh>
@@ -325,7 +454,7 @@ export default function GameBoard() {
         >
           <mesh rotation={[0, 0, -Math.PI / 2]} raycast={disableRaycast}>
             <coneGeometry args={[0.24, 0.58, 3]} />
-            <meshBasicMaterial color="#ff5d8f" />
+            <meshBasicMaterial color={mapTheme.marker} />
           </mesh>
         </group>
       ))}

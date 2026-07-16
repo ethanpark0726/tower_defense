@@ -70,9 +70,9 @@ export default function App() {
             </p>
 
             <div className="menu-team-preview" aria-label="Healthy defenders versus sweet snacks">
-              <span className="team-chip defenders">Carrot · Broccoli · Milk</span>
+              <span className="team-chip defenders">Carrot / Broccoli / Milk</span>
               <span className="team-versus">VS</span>
-              <span className="team-chip snacks">Chocolate · Candy · Jelly</span>
+              <span className="team-chip snacks">Chocolate / Candy / Jelly</span>
             </div>
             
             <fieldset className="difficulty-picker">

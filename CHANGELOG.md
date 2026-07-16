@@ -10,6 +10,19 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.9.0] - 2026-07-15
+
+### Added
+
+- Added rotating mouth-zone map themes for Gum Garden, Calcium Cove, and Plaque Patrol.
+- Added wave-aware board colors for the background, fog, tongue, route, route glow, and direction markers.
+- Added themed 3D decorations such as veggie sprouts, calcium bubbles, and plaque cleanup sparkles.
+- Added the current mouth-zone name to the in-game wave card.
+
+### Changed
+
+- Replaced decorative middle-dot menu separators with ASCII slashes for more robust English-only text rendering.
+
 ## [1.8.1] - 2026-07-15
 
 ### Fixed

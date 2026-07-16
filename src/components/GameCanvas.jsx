@@ -8,7 +8,7 @@ import EnemyManager from './EnemyManager';
 import TowerManager from './TowerManager';
 import ProjectileSystem from './ProjectileSystem';
 import ParticleSystem, { triggerExplosion } from './ParticleSystem';
-import { useGameStore } from '../gameStore';
+import { getMapThemeForWave, useGameStore } from '../gameStore';
 
 function BrushBlastParticles() {
   const brushBlastEvent = useGameStore((state) => state.brushBlastEvent);
@@ -60,6 +60,8 @@ function PerformanceMonitor() {
 
 export default function GameCanvas() {
   const performanceMode = useGameStore(state => state.performanceMode);
+  const wave = useGameStore(state => state.wave);
+  const mapTheme = getMapThemeForWave(wave || 1);
 
   return (
     <Canvas
@@ -72,12 +74,12 @@ export default function GameCanvas() {
         left: 0,
         width: '100%',
         height: '100%',
-        background: '#ffd8d2'
+        background: mapTheme.background
       }}
       gl={{ antialias: false, powerPreference: "high-performance" }}
     >
-      <color attach="background" args={['#ffd8d2']} />
-      <fog attach="fog" args={['#ffd8d2', 30, 52]} />
+      <color attach="background" args={[mapTheme.background]} />
+      <fog attach="fog" args={[mapTheme.fog, 30, 52]} />
 
       {/* Lights & Ambient Global Illumination */}
       <ambientLight intensity={performanceMode === 'high' ? 0.68 : 0.82} />
