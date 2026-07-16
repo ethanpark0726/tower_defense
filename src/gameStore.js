@@ -6,6 +6,62 @@ export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 10;
 export const TOTAL_WAVES = 10;
 
+export const MAP_THEMES = [
+  {
+    id: 'gum_garden',
+    name: 'Gum Garden',
+    shortName: 'Garden',
+    description: 'A soft gumline with veggie patches for the first patrols.',
+    background: '#ffd8d2',
+    fog: '#ffd8d2',
+    mouth: '#6f233d',
+    tongue: '#d96b80',
+    route: '#ffd6a5',
+    routeBorder: '#fff9e8',
+    routeGlow: '#ff9eb5',
+    marker: '#ff5d8f',
+    accent: '#7ac943',
+    secondaryAccent: '#ffd166'
+  },
+  {
+    id: 'calcium_cove',
+    name: 'Calcium Cove',
+    shortName: 'Cove',
+    description: 'A bright milk-splash zone with cool calcium shine.',
+    background: '#dff7ff',
+    fog: '#f4fcff',
+    mouth: '#653247',
+    tongue: '#dd7891',
+    route: '#c8f3ff',
+    routeBorder: '#fffdf4',
+    routeGlow: '#7bdff2',
+    marker: '#2bbfd9',
+    accent: '#7bdff2',
+    secondaryAccent: '#ffffff'
+  },
+  {
+    id: 'plaque_patrol',
+    name: 'Plaque Patrol',
+    shortName: 'Patrol',
+    description: 'A tricky cleanup route with plaque spots to scrub away.',
+    background: '#fff1c7',
+    fog: '#fff8df',
+    mouth: '#7a2a45',
+    tongue: '#d7657a',
+    route: '#ffe08a',
+    routeBorder: '#fff7d6',
+    routeGlow: '#fbbf24',
+    marker: '#f97316',
+    accent: '#a86cf3',
+    secondaryAccent: '#45b649'
+  }
+];
+
+export const getMapThemeForWave = (wave) => {
+  const themeIndex = Math.max(0, wave - 1) % MAP_THEMES.length;
+  return MAP_THEMES[themeIndex];
+};
+
 export const DIFFICULTIES = {
   easy: {
     label: 'Easy',

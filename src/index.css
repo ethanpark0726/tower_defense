@@ -148,6 +148,7 @@ body {
 .wave-card {
   padding: 12px 24px;
   text-align: center;
+  min-width: 178px;
 }
 
 .wave-label {
@@ -162,6 +163,26 @@ body {
   font-size: 1.8rem;
   font-weight: 800;
   color: var(--neon-cyan);
+}
+
+.map-stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 22px;
+  margin-top: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.map-stage svg {
+  flex-shrink: 0;
 }
 
 .wave-preview {
@@ -925,7 +946,7 @@ body {
   .stat-group { gap: 8px; }
   .stat-card { min-width: 118px; padding: 10px 12px; }
   .stat-value { font-size: 1.2rem; }
-  .wave-card { padding: 10px 14px; }
+  .wave-card { min-width: 154px; padding: 10px 14px; }
   .wave-number { font-size: 1.35rem; }
   .control-btn { padding: 13px 16px; font-size: 0.85rem; }
   .tower-shop { padding: 11px; gap: 8px; }
@@ -940,7 +961,7 @@ body {
   .stat-label, .wave-label { font-size: 0.62rem; }
   .stat-card { min-width: auto; padding: 9px; }
   .stat-icon { display: none; }
-  .wave-card { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); }
+  .wave-card { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); min-width: 148px; }
   .sound-btn { width: 42px; height: 42px; }
   .control-btn { padding: 11px 13px; }
   .control-btn svg { display: none; }

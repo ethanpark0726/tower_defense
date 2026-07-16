@@ -16,6 +16,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 8: Tooth Guardians browser branding and metadata - complete
 - Phase 9: selectable difficulty and rebalanced snack waves - complete
 - Phase 10: 3D mouth, gum, tongue, lip, and tooth playfield - complete
+- Phase 11: rotating mouth-zone map themes and route variety - in review
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
@@ -63,6 +64,7 @@ GitHub Actions runs the English-only policy check, commit whitespace validation,
 - Build defenders on the tongue grid while keeping the snack route clear.
 - Click a placed tower to inspect, upgrade, or sell it.
 - Start the next wave from the top-right button.
+- Watch the current mouth zone change between Gum Garden, Calcium Cove, and Plaque Patrol.
 - Review the snack counts and strategy tip in the next-wave preview before starting.
 - Use the speaker button to turn game sounds on or off.
 - Use Brush Blast once per wave to scrub every snack currently visible on the route.
