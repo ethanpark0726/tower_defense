@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom, SSAO, SMAA } from '@react-three/postprocessing';
 import GameBoard from './GameBoard';
 import EnemyManager from './EnemyManager';
@@ -98,9 +98,6 @@ export default function GameCanvas() {
       
       <pointLight position={[-8, 5, -8]} intensity={0.65} color="#ffd166" />
       <pointLight position={[8, 5, 8]} intensity={0.65} color="#ff8fab" />
-
-      {/* Soft reflections keep the mouth environment bright and friendly */}
-      <Environment preset="park" environmentIntensity={0.35} />
 
       {/* Orbit Controls with limited tilt angles (child friendly navigation) */}
       <OrbitControls
