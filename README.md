@@ -1,8 +1,23 @@
 # Tower Defense 3D
 
 [![CI](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml)
+![Version](https://img.shields.io/badge/version-1.10.0-7bdff2)
+![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-111111?logo=three.js&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)
+![Status](https://img.shields.io/badge/status-phase%2012%20in%20review-f59e0b)
+![License](https://img.shields.io/badge/license-all%20rights%20reserved-6b7280)
 
 A browser-based 3D tower defense game built with React, Three.js, React Three Fiber, and Zustand. The project is being developed in small, reviewable phases toward a child-friendly tooth-defense theme.
+
+## Feature Highlights
+
+- Tooth-defense theme with chocolate, candy, and jelly snacks attacking a friendly tooth.
+- Healthy-food defenders including Carrot Shooter, Broccoli Bomber, and Milk Beam.
+- Rotating mouth-zone maps for Gum Garden, Calcium Cove, and Plaque Patrol.
+- Easy, Normal, and Challenge patrol difficulty choices.
+- Generated Web Audio effects and background music with no external audio files.
+- Brush Blast, a once-per-wave ability that scrubs visible snacks on the route.
 
 ## Current Status
 
@@ -16,7 +31,8 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 8: Tooth Guardians browser branding and metadata - complete
 - Phase 9: selectable difficulty and rebalanced snack waves - complete
 - Phase 10: 3D mouth, gum, tongue, lip, and tooth playfield - complete
-- Phase 11: rotating mouth-zone map themes and route variety - in review
+- Phase 11: rotating mouth-zone map themes and route variety - complete
+- Phase 12: generated child-friendly background music - in review
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
@@ -66,7 +82,7 @@ GitHub Actions runs the English-only policy check, commit whitespace validation,
 - Start the next wave from the top-right button.
 - Watch the current mouth zone change between Gum Garden, Calcium Cove, and Plaque Patrol.
 - Review the snack counts and strategy tip in the next-wave preview before starting.
-- Use the speaker button to turn game sounds on or off.
+- Use the speaker button to turn music and game sounds on or off.
 - Use Brush Blast once per wave to scrub every snack currently visible on the route.
 - Drag to rotate the camera and scroll to zoom.
 

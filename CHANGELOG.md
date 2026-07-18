@@ -10,6 +10,22 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.10.0] - 2026-07-17
+
+### Added
+
+- Added generated child-friendly background music using Web Audio oscillators instead of external audio files.
+- Added a soft looping melody, bass pulse, and sparkle layer that changes pace during active snack waves.
+- Added a short confirmation tone when music and sounds are turned back on.
+
+### Changed
+
+- Updated the speaker button labels to control both music and game sounds.
+- Muted the background music automatically outside active gameplay screens.
+- Increased the generated background music mix so the melody is easier to hear during play.
+- Raised the background music tempo and note density for a brighter, faster beat.
+- Expanded the README badges and feature highlights to better show project status and technology.
+
 ## [1.9.0] - 2026-07-15
 
 ### Added
