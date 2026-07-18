@@ -130,10 +130,10 @@ export default function GameHUD() {
         {/* Next Wave Button */}
         <div className="hud-actions interactive">
           <button
-            className="sound-btn"
+            className={`sound-btn ${soundEnabled ? '' : 'muted'}`}
             onClick={toggleSound}
-            aria-label={soundEnabled ? 'Mute sounds' : 'Turn sounds on'}
-            title={soundEnabled ? 'Mute sounds' : 'Turn sounds on'}
+            aria-label={soundEnabled ? 'Mute music and sounds' : 'Turn music and sounds on'}
+            title={soundEnabled ? 'Mute music and sounds' : 'Turn music and sounds on'}
           >
             {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
           </button>

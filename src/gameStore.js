@@ -251,7 +251,13 @@ export const useGameStore = create((set, get) => ({
   
   setPerformanceMode: (mode) => set({ performanceMode: mode }),
 
-  toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+  toggleSound: () => set((state) => {
+    const soundEnabled = !state.soundEnabled;
+    return {
+      soundEnabled,
+      ...(soundEnabled && { feedbackEvent: createFeedbackEvent('soundOn') })
+    };
+  }),
   setDifficulty: (difficulty) => {
     if (DIFFICULTIES[difficulty]) set({ difficulty });
   },
