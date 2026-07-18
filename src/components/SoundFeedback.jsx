@@ -3,6 +3,7 @@ import { useGameStore } from '../gameStore';
 
 let audioContext = null;
 let musicEngine = null;
+const MUSIC_MASTER_VOLUME = 0.52;
 
 const getAudioContext = () => {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -77,17 +78,17 @@ const createMusicEngine = (context) => {
     const bassNote = bass[Math.floor(step / 2) % bass.length];
 
     if (step % 2 === 0) {
-      scheduleMusicTone(context, masterGain, melodyNote, beatAt, beatDuration * 0.52, 0.018, 'triangle');
+      scheduleMusicTone(context, masterGain, melodyNote, beatAt, beatDuration * 0.52, 0.034, 'triangle');
     }
 
     if (step % 4 === 0) {
-      scheduleMusicTone(context, masterGain, bassNote, beatAt, beatDuration * 1.55, 0.012, 'sine');
-      scheduleMusicTone(context, masterGain, bassNote * 2, beatAt + beatDuration * 0.04, beatDuration * 1.1, 0.006, 'triangle');
+      scheduleMusicTone(context, masterGain, bassNote, beatAt, beatDuration * 1.55, 0.022, 'sine');
+      scheduleMusicTone(context, masterGain, bassNote * 2, beatAt + beatDuration * 0.04, beatDuration * 1.1, 0.012, 'triangle');
     }
 
     if (waveActive || step % 4 === 2) {
       const sparkleNote = sparkle[step % sparkle.length] * themeLift;
-      scheduleMusicTone(context, masterGain, sparkleNote, beatAt + beatDuration * 0.5, beatDuration * 0.16, 0.008, 'sine');
+      scheduleMusicTone(context, masterGain, sparkleNote, beatAt + beatDuration * 0.5, beatDuration * 0.16, 0.016, 'sine');
     }
 
     step += 1;
@@ -117,7 +118,7 @@ const createMusicEngine = (context) => {
       nextBeatAt = Math.max(nextBeatAt, context.currentTime + 0.05);
       masterGain.gain.cancelScheduledValues(context.currentTime);
       masterGain.gain.setValueAtTime(Math.max(masterGain.gain.value, 0.0001), context.currentTime);
-      masterGain.gain.exponentialRampToValueAtTime(0.28, context.currentTime + 0.45);
+      masterGain.gain.exponentialRampToValueAtTime(MUSIC_MASTER_VOLUME, context.currentTime + 0.45);
       startTimer();
       tick();
     },
