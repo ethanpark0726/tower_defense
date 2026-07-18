@@ -3,7 +3,13 @@ import { useGameStore } from '../gameStore';
 
 let audioContext = null;
 let musicEngine = null;
-const MUSIC_MASTER_VOLUME = 0.52;
+const MUSIC_MASTER_VOLUME = 0.85;
+const MUSIC_IDLE_TEMPO = 128;
+const MUSIC_WAVE_TEMPO = 160;
+const MUSIC_MELODY_VOLUME = 0.072;
+const MUSIC_BASS_VOLUME = 0.04;
+const MUSIC_BASS_HARMONIC_VOLUME = 0.02;
+const MUSIC_SPARKLE_VOLUME = 0.028;
 
 const getAudioContext = () => {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -68,7 +74,7 @@ const createMusicEngine = (context) => {
   let wave = 0;
   let waveActive = false;
 
-  const getTempo = () => (waveActive ? 132 : 108);
+  const getTempo = () => (waveActive ? MUSIC_WAVE_TEMPO : MUSIC_IDLE_TEMPO);
   const getThemeLift = () => [1, 9 / 8, 5 / 4][Math.max(0, wave - 1) % 3];
 
   const scheduleBeat = (beatAt) => {
@@ -77,18 +83,16 @@ const createMusicEngine = (context) => {
     const melodyNote = melody[step % melody.length] * themeLift;
     const bassNote = bass[Math.floor(step / 2) % bass.length];
 
+    scheduleMusicTone(context, masterGain, melodyNote, beatAt, beatDuration * 0.48, MUSIC_MELODY_VOLUME, 'triangle');
+
     if (step % 2 === 0) {
-      scheduleMusicTone(context, masterGain, melodyNote, beatAt, beatDuration * 0.52, 0.034, 'triangle');
+      scheduleMusicTone(context, masterGain, bassNote, beatAt, beatDuration * 1.25, MUSIC_BASS_VOLUME, 'sine');
+      scheduleMusicTone(context, masterGain, bassNote * 2, beatAt + beatDuration * 0.04, beatDuration * 0.88, MUSIC_BASS_HARMONIC_VOLUME, 'triangle');
     }
 
-    if (step % 4 === 0) {
-      scheduleMusicTone(context, masterGain, bassNote, beatAt, beatDuration * 1.55, 0.022, 'sine');
-      scheduleMusicTone(context, masterGain, bassNote * 2, beatAt + beatDuration * 0.04, beatDuration * 1.1, 0.012, 'triangle');
-    }
-
-    if (waveActive || step % 4 === 2) {
+    if (waveActive || step % 2 === 1) {
       const sparkleNote = sparkle[step % sparkle.length] * themeLift;
-      scheduleMusicTone(context, masterGain, sparkleNote, beatAt + beatDuration * 0.5, beatDuration * 0.16, 0.016, 'sine');
+      scheduleMusicTone(context, masterGain, sparkleNote, beatAt + beatDuration * 0.5, beatDuration * 0.18, MUSIC_SPARKLE_VOLUME, 'sine');
     }
 
     step += 1;
