@@ -1,12 +1,13 @@
 {
   "name": "tower-defense-3d",
   "private": true,
-  "version": "1.10.0",
+  "version": "1.11.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "check:english": "node scripts/check-english.mjs",
+    "check:rules": "node scripts/check-game-rules.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
