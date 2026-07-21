@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { DIFFICULTIES, ENEMY_TYPES, getMapThemeForWave, getWaveComposition, TOTAL_WAVES, TOWER_TYPES, useGameStore } from '../gameStore';
+import { DIFFICULTIES, ENEMY_TYPES, getBoardRouteWave, getMapThemeForWave, getWaveComposition, TOTAL_WAVES, TOWER_TYPES, useGameStore } from '../gameStore';
 import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { Coins, Heart, Swords, Carrot, Sprout, Milk, ArrowUpCircle, Trash2, Volume2, VolumeX, Star, Sparkles, Cookie, Candy, Crown, Map } from 'lucide-react';
 
@@ -28,7 +28,8 @@ export default function GameHUD() {
 
   const selectedPlacedTower = towers.find(t => t.id === selectedPlacedTowerId);
   const nextWaveComposition = useMemo(() => getWaveComposition(wave + 1), [wave]);
-  const mapTheme = getMapThemeForWave(wave || 1);
+  const routeWave = getBoardRouteWave(wave, waveActive);
+  const mapTheme = getMapThemeForWave(routeWave);
   const [visibleReward, setVisibleReward] = useState(null);
   const [visibleBrushBlast, setVisibleBrushBlast] = useState(null);
 
@@ -120,7 +121,7 @@ export default function GameHUD() {
         {/* Wave Stats */}
         <div className="glass-panel wave-card interactive">
           <span className="wave-label">{DIFFICULTIES[difficulty].label} Patrol</span>
-          <div className="wave-number">WAVE {wave} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ {TOTAL_WAVES}</span></div>
+          <div className="wave-number">WAVE {routeWave} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ {TOTAL_WAVES}</span></div>
           <div className="map-stage" style={{ color: mapTheme.marker }}>
             <Map size={14} />
             <span>{mapTheme.name}</span>

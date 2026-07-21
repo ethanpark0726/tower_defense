@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useGameStore, WAYPOINTS } from '../gameStore';
+import { getRouteForWave, useGameStore } from '../gameStore';
 import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { triggerExplosion } from './ParticleSystem';
 
@@ -24,28 +24,26 @@ const WRAPPER_RIGHT_ROTATION = new THREE.Quaternion().setFromEuler(
   new THREE.Euler(0, 0, -Math.PI / 2)
 );
 
-const calculatePathLength = () => {
+const calculatePathLength = (route) => {
   let length = 0;
 
-  for (let index = 0; index < WAYPOINTS.length - 1; index++) {
-    const start = WAYPOINTS[index];
-    const end = WAYPOINTS[index + 1];
+  for (let index = 0; index < route.length - 1; index++) {
+    const start = route[index];
+    const end = route[index + 1];
     length += Math.hypot(end.x - start.x, end.z - start.z);
   }
 
   return length;
 };
 
-const PATH_TOTAL_LENGTH = calculatePathLength();
-
-const getPathPositionAndDirection = (distance) => {
+const getPathPositionAndDirection = (distance, route) => {
   let currentDistance = 0;
   const position = new THREE.Vector3();
   const direction = new THREE.Vector3(0, 0, 1);
 
-  for (let index = 0; index < WAYPOINTS.length - 1; index++) {
-    const start = WAYPOINTS[index];
-    const end = WAYPOINTS[index + 1];
+  for (let index = 0; index < route.length - 1; index++) {
+    const start = route[index];
+    const end = route[index + 1];
     const dx = end.x - start.x;
     const dz = end.z - start.z;
     const segmentLength = Math.hypot(dx, dz);
@@ -60,7 +58,7 @@ const getPathPositionAndDirection = (distance) => {
     currentDistance += segmentLength;
   }
 
-  const finalWaypoint = WAYPOINTS[WAYPOINTS.length - 1];
+  const finalWaypoint = route[route.length - 1];
   position.set(finalWaypoint.x, finalWaypoint.y, finalWaypoint.z);
   return { position, direction };
 };
@@ -163,6 +161,8 @@ export default function EnemyManager() {
     const lookDirection = new THREE.Vector3();
     const leftShift = new THREE.Vector3();
     const healthBarRotation = new THREE.Quaternion();
+    const route = getRouteForWave(wave || 1);
+    const pathTotalLength = calculatePathLength(route);
 
     const placeComponent = (
       meshRef,
@@ -207,12 +207,12 @@ export default function EnemyManager() {
 
       localData.distanceTraveled += frameDelta * enemy.speed;
 
-      if (localData.distanceTraveled >= PATH_TOTAL_LENGTH) {
+      if (localData.distanceTraveled >= pathTotalLength) {
         leakEnemy(enemy.id);
         return;
       }
 
-      const { position, direction } = getPathPositionAndDirection(localData.distanceTraveled);
+      const { position, direction } = getPathPositionAndDirection(localData.distanceTraveled, route);
       const movementAngle = Math.atan2(-direction.z, direction.x);
       baseRotation.setFromAxisAngle(Y_AXIS, movementAngle);
       basePosition.copy(position);

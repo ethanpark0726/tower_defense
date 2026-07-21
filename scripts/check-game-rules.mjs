@@ -2,13 +2,29 @@ import assert from 'node:assert/strict';
 import {
   DIFFICULTIES,
   TOTAL_WAVES,
+  getBoardRouteWave,
   getEnemyStatsForWave,
+  getRouteForWave,
+  isCellOnPath,
+  ROUTE_LAYOUTS,
   getWaveComposition
 } from '../src/gameStore.js';
 
 assert.equal(TOTAL_WAVES, 20, 'Tooth Guardians should run for 20 waves.');
 
 assert.deepEqual(getWaveComposition(21), { normal: 0, fast: 0, boss: 0, total: 0 });
+
+assert.equal(ROUTE_LAYOUTS.length, 2, 'Tooth Guardians should use one early route and one late route.');
+assert.deepEqual(getRouteForWave(1), getRouteForWave(10), 'Waves 1 through 10 should keep the same route.');
+assert.notDeepEqual(getRouteForWave(10), getRouteForWave(11), 'Wave 11 should introduce the late-game route.');
+assert.deepEqual(getRouteForWave(11), getRouteForWave(20), 'Waves 11 through 20 should keep the late-game route.');
+assert.deepEqual(getRouteForWave(getBoardRouteWave(1, false)), getRouteForWave(1), 'The board should keep the early route while preparing early waves.');
+assert.equal(getBoardRouteWave(1, true), 1, 'The board should keep the active route during a wave.');
+assert.equal(getBoardRouteWave(10, false), 11, 'The board should preview the late route after Wave 10.');
+assert.ok(isCellOnPath(-3, 3, 1), 'Wave 1 should block the visible route centerline.');
+assert.equal(isCellOnPath(-4, 4, 1), false, 'Wave 1 should allow the empty tongue tile beside the route.');
+assert.equal(isCellOnPath(8, -8, 1), false, 'Wave 1 should allow an off-route tower cell.');
+assert.equal(isCellOnPath(-8, -6, 1), false, 'Wave 1 should allow a tile that only belongs to a future route.');
 
 const wave10 = getWaveComposition(10);
 const wave11 = getWaveComposition(11);
