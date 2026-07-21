@@ -22,6 +22,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
 Repository-wide implementation and validation rules for coding agents are defined in [AGENTS.md](AGENTS.md).
 
+Project-scoped agent skills are tracked in [skills-lock.json](skills-lock.json), installed under `.agents/skills/`, and grounded by [CONTEXT.md](CONTEXT.md).
+
 ## Requirements
 
 - Node.js LTS
@@ -103,6 +105,7 @@ scripts/
 - Build and browser smoke tests are completed before merging.
 - Visual features require direct screenshot or browser inspection; state changes alone are not sufficient evidence.
 - User-facing changes are recorded in `CHANGELOG.md`.
+- Agent-assisted work uses the repository-local skills, `CONTEXT.md`, and the Ponytail bias in `AGENTS.md` without replacing required visual validation.
 
 ## Technology
 
