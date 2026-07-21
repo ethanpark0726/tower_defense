@@ -13,6 +13,19 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.11.0] - 2026-07-21
+
+### Added
+
+- Extended Tooth Guardians from 10 waves to 20 waves.
+- Added a lightweight game-rules check for wave length, late-wave pressure, and Challenge tuning.
+
+### Changed
+
+- Made Challenge patrol start with fewer Smile Coins and lower Tooth Health.
+- Increased Challenge snack HP, speed, spawn pressure, and reduced Challenge rewards.
+- Increased late-wave snack counts and added extra Jelly King pressure after the old 10-wave finale.
+
 ## [1.10.0] - 2026-07-17
 
 ### Added

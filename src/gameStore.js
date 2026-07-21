@@ -4,7 +4,7 @@ import { create } from 'zustand';
 export const GRID_CELL_SIZE = 2;
 export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 10;
-export const TOTAL_WAVES = 10;
+export const TOTAL_WAVES = 20;
 
 export const MAP_THEMES = [
   {
@@ -85,13 +85,13 @@ export const DIFFICULTIES = {
   },
   challenge: {
     label: 'Challenge',
-    description: 'Fewer supplies against a fast and powerful snack rush.',
-    startingGold: 300,
-    startingLives: 15,
-    enemyHp: 1.4,
-    enemySpeed: 1.15,
-    enemyReward: 0.85,
-    spawnDelay: 0.75
+    description: 'Low supplies against a fast, powerful snack rush.',
+    startingGold: 225,
+    startingLives: 10,
+    enemyHp: 1.85,
+    enemySpeed: 1.35,
+    enemyReward: 0.7,
+    spawnDelay: 0.55
   }
 };
 
@@ -198,9 +198,10 @@ export const getWaveComposition = (wave) => {
     return { normal: 0, fast: 0, boss: 0, total: 0 };
   }
 
-  const normal = 5 + wave * 2;
-  const fast = wave >= 3 ? 3 + wave : 0;
-  const boss = wave % 5 === 0 ? wave / 5 : 0;
+  const lateWave = Math.max(0, wave - 10);
+  const normal = 5 + wave * 2 + lateWave;
+  const fast = wave >= 3 ? 3 + wave + Math.floor(lateWave / 2) : 0;
+  const boss = wave % 5 === 0 ? wave / 5 : wave >= 12 && wave % 4 === 0 ? 1 : 0;
 
   return { normal, fast, boss, total: normal + fast + boss };
 };
