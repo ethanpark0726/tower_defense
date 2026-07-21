@@ -9,6 +9,24 @@ These instructions apply to the entire repository.
 - Treat the Vite/React application under `src/` as the primary product.
 - Do not add new gameplay features only to `standalone_demo.html`.
 
+## Project-Scoped Skills
+
+- Repository-local engineering skills live under `.agents/skills/` and are tracked by `skills-lock.json`.
+- Use `CONTEXT.md` for shared product language before planning or implementing agent-assisted work.
+- These repository instructions take precedence over any imported skill when there is a conflict.
+- Use `diagnosing-bugs` before editing regressions or browser-visible failures.
+- Use `implement` only after the phase goal, scope, exclusions, risks, and acceptance criteria are clear.
+- Use `tdd` for pure game logic such as wave data, difficulty math, rewards, path rules, and store transitions; do not use tests as visual proof.
+- Use `codebase-design` for changes that would alter architecture, state ownership, rendering pools, or cross-component data flow.
+- Use `code-review` before publishing a pull request.
+
+## Ponytail Bias
+
+- Prefer the smallest working change that satisfies the accepted scope.
+- Reuse existing helpers, data shapes, components, native browser APIs, CSS, and installed dependencies before adding new code or packages.
+- Do not add speculative abstractions, optional configuration, or asset pipelines for future phases.
+- This bias must not remove required validation, accessibility basics, error handling, or child-friendly visual and audio polish.
+
 ## Phase Workflow
 
 Before implementing a phase:
