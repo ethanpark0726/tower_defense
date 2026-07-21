@@ -13,6 +13,18 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.12.0] - 2026-07-21
+
+### Added
+
+- Added one route for Waves 1-10 and a second route for Waves 11-20.
+- Added game-rules checks that verify the early-route and late-route split plus route-based placement blocking.
+
+### Changed
+
+- Updated the board, snack movement, and tower placement rules to share the same wave route.
+- Keep route strategy stable for Waves 1-10, then switch once for the late-game Waves 11-20 stretch.
+
 ## [1.11.0] - 2026-07-21
 
 ### Added

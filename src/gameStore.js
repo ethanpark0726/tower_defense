@@ -95,37 +95,58 @@ export const DIFFICULTIES = {
   }
 };
 
-// Waypoints for enemies to walk along (S-Curve path)
-export const WAYPOINTS = [
-  { x: -11, y: 0.25, z: 3 },
-  { x: -3,  y: 0.25, z: 3 },
-  { x: -3,  y: 0.25, z: -5 },
-  { x: 3,   y: 0.25, z: -5 },
-  { x: 3,   y: 0.25, z: 5 },
-  { x: 11,  y: 0.25, z: 5 }
+// Route layouts for snacks to walk along. All routes share the candy gate and tooth goal.
+export const ROUTE_LAYOUTS = [
+  [
+    { x: -11, y: 0.25, z: 3 },
+    { x: -3, y: 0.25, z: 3 },
+    { x: -3, y: 0.25, z: -5 },
+    { x: 3, y: 0.25, z: -5 },
+    { x: 3, y: 0.25, z: 5 },
+    { x: 11, y: 0.25, z: 5 }
+  ],
+  [
+    { x: -11, y: 0.25, z: 3 },
+    { x: -7, y: 0.25, z: 3 },
+    { x: -7, y: 0.25, z: -7 },
+    { x: 1, y: 0.25, z: -7 },
+    { x: 1, y: 0.25, z: 1 },
+    { x: 7, y: 0.25, z: 1 },
+    { x: 7, y: 0.25, z: 5 },
+    { x: 11, y: 0.25, z: 5 }
+  ]
 ];
 
-// Helper: Check if a grid cell overlaps with the path
-export const isCellOnPath = (x, z) => {
-  // Convert position to grid indices
-  // We check proximity to the segment lines connecting WAYPOINTS
-  for (let i = 0; i < WAYPOINTS.length - 1; i++) {
-    const p1 = WAYPOINTS[i];
-    const p2 = WAYPOINTS[i + 1];
-    
-    // Check horizontal segment
-    if (Math.abs(p1.z - p2.z) < 0.1) {
-      const minX = Math.min(p1.x, p2.x) - GRID_CELL_SIZE / 2;
-      const maxX = Math.max(p1.x, p2.x) + GRID_CELL_SIZE / 2;
-      if (z === p1.z && x >= minX && x <= maxX) return true;
-    }
-    // Check vertical segment
-    if (Math.abs(p1.x - p2.x) < 0.1) {
-      const minZ = Math.min(p1.z, p2.z) - GRID_CELL_SIZE / 2;
-      const maxZ = Math.max(p1.z, p2.z) + GRID_CELL_SIZE / 2;
-      if (x === p1.x && z >= minZ && z <= maxZ) return true;
-    }
+export const getRouteForWave = (wave) => {
+  return wave <= 10 ? ROUTE_LAYOUTS[0] : ROUTE_LAYOUTS[1];
+};
+
+export const WAYPOINTS = ROUTE_LAYOUTS[0];
+
+export const getBoardRouteWave = (wave, waveActive) => (
+  waveActive ? wave : Math.max(1, Math.min(wave + 1, TOTAL_WAVES))
+);
+
+// Helper: Check if a grid cell overlaps with the route for a wave.
+export const isCellOnPath = (x, z, wave = 1) => {
+  const route = getRouteForWave(wave);
+  const blockRadius = GRID_CELL_SIZE * 0.45;
+
+  for (let i = 0; i < route.length - 1; i++) {
+    const start = route[i];
+    const end = route[i + 1];
+    const dx = end.x - start.x;
+    const dz = end.z - start.z;
+    const segmentLengthSquared = dx * dx + dz * dz;
+    const ratio = segmentLengthSquared === 0
+      ? 0
+      : Math.max(0, Math.min(1, ((x - start.x) * dx + (z - start.z) * dz) / segmentLengthSquared));
+    const closestX = start.x + dx * ratio;
+    const closestZ = start.z + dz * ratio;
+
+    if (Math.hypot(x - closestX, z - closestZ) <= blockRadius) return true;
   }
+
   return false;
 };
 
@@ -312,7 +333,8 @@ export const useGameStore = create((set, get) => ({
     
     // Check if cell already occupied or on path
     const alreadyOccupied = get().towers.some(t => t.x === x && t.z === z);
-    if (alreadyOccupied || isCellOnPath(x, z)) return false;
+    const routeWave = getBoardRouteWave(get().wave, get().waveActive);
+    if (alreadyOccupied || isCellOnPath(x, z, routeWave)) return false;
     
     const newTower = {
       id: `tower_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,

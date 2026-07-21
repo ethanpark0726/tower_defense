@@ -8,7 +8,7 @@ import EnemyManager from './EnemyManager';
 import TowerManager from './TowerManager';
 import ProjectileSystem from './ProjectileSystem';
 import ParticleSystem, { triggerExplosion } from './ParticleSystem';
-import { getMapThemeForWave, useGameStore } from '../gameStore';
+import { getBoardRouteWave, getMapThemeForWave, useGameStore } from '../gameStore';
 
 function BrushBlastParticles() {
   const brushBlastEvent = useGameStore((state) => state.brushBlastEvent);
@@ -61,7 +61,8 @@ function PerformanceMonitor() {
 export default function GameCanvas() {
   const performanceMode = useGameStore(state => state.performanceMode);
   const wave = useGameStore(state => state.wave);
-  const mapTheme = getMapThemeForWave(wave || 1);
+  const waveActive = useGameStore(state => state.waveActive);
+  const mapTheme = getMapThemeForWave(getBoardRouteWave(wave, waveActive));
 
   return (
     <Canvas

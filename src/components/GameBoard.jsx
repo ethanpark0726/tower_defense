@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import * as THREE from 'three';
 import {
   useGameStore,
   GRID_CELL_SIZE,
   GRID_WIDTH,
   GRID_HEIGHT,
-  WAYPOINTS,
+  getBoardRouteWave,
   getMapThemeForWave,
+  getRouteForWave,
   isCellOnPath
 } from '../gameStore';
 
@@ -82,8 +83,8 @@ const MAP_DECORATIONS = {
   }
 };
 
-const PATH_SEGMENTS = WAYPOINTS.slice(0, -1).map((start, index) => {
-  const end = WAYPOINTS[index + 1];
+const createPathSegments = (route) => route.slice(0, -1).map((start, index) => {
+  const end = route[index + 1];
   const dx = end.x - start.x;
   const dz = end.z - start.z;
 
@@ -98,7 +99,7 @@ const PATH_SEGMENTS = WAYPOINTS.slice(0, -1).map((start, index) => {
   };
 });
 
-const PATH_MARKERS = PATH_SEGMENTS.flatMap((segment) => {
+const createPathMarkers = (pathSegments) => pathSegments.flatMap((segment) => {
   const markerCount = Math.max(1, Math.floor(segment.length / 3));
 
   return Array.from({ length: markerCount }, (_, markerIndex) => {
@@ -330,6 +331,7 @@ export default function GameBoard() {
   const { 
     wave,
     selectedTowerToBuild, 
+    waveActive,
     placeTower, 
     towers, 
     selectPlacedTower, 
@@ -337,7 +339,11 @@ export default function GameBoard() {
   } = useGameStore();
 
   const [hoveredCell, setHoveredCell] = useState(null);
-  const mapTheme = getMapThemeForWave(wave || 1);
+  const routeWave = getBoardRouteWave(wave, waveActive);
+  const mapTheme = getMapThemeForWave(routeWave);
+  const route = useMemo(() => getRouteForWave(routeWave), [routeWave]);
+  const pathSegments = useMemo(() => createPathSegments(route), [route]);
+  const pathMarkers = useMemo(() => createPathMarkers(pathSegments), [pathSegments]);
 
   // Compute grid borders/coordinates
   const halfWidth = (GRID_WIDTH * GRID_CELL_SIZE) / 2;
@@ -359,7 +365,7 @@ export default function GameBoard() {
     const gridX = Math.max(-halfWidth + GRID_CELL_SIZE / 2, Math.min(halfWidth - GRID_CELL_SIZE / 2, rawX));
     const gridZ = Math.max(-halfHeight + GRID_CELL_SIZE / 2, Math.min(halfHeight - GRID_CELL_SIZE / 2, rawZ));
 
-    const onPath = isCellOnPath(gridX, gridZ);
+    const onPath = isCellOnPath(gridX, gridZ, routeWave);
     const occupied = towers.some(t => t.x === gridX && t.z === gridZ);
     const isValid = !onPath && !occupied;
 
@@ -422,7 +428,7 @@ export default function GameBoard() {
       />
 
       {/* Continuous route with a bright border */}
-      {PATH_SEGMENTS.map((segment) => (
+      {pathSegments.map((segment) => (
         <group
           key={`path_segment_${segment.index}`}
           position={[segment.midpoint[0], 0.055, segment.midpoint[1]]}
@@ -446,7 +452,7 @@ export default function GameBoard() {
       ))}
 
       {/* Direction markers stay visible without relying only on color */}
-      {PATH_MARKERS.map((marker) => (
+      {pathMarkers.map((marker) => (
         <group
           key={`path_marker_${marker.key}`}
           position={[marker.x, 0.19, marker.z]}
