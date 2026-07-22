@@ -112,7 +112,13 @@ export default function ProjectileSystem() {
 
         if (step >= dist) {
           // Impact reached!
-          if (targetData && !targetData.dead) {
+          if (proj.type === 'tomato') {
+            activeEnemiesPositions.forEach((enemy) => {
+              if (enemy.dead || enemy.position.distanceTo(proj.lastTargetPos) > 1.8) return;
+              damageEnemy(enemy.id, proj.damage);
+              slowEnemy(enemy.id, TOWER_TYPES.tomato.slowMultiplier, TOWER_TYPES.tomato.slowDurationMs);
+            });
+          } else if (targetData && !targetData.dead) {
             // Apply damage
             if (proj.type === 'cannon') {
               // AoE damage check: damage all enemies near impact zone
@@ -123,12 +129,6 @@ export default function ProjectileSystem() {
                 if (distToImpact <= splashRadius) {
                   damageEnemy(enemy.id, Math.round(proj.damage * (1 - distToImpact / (splashRadius + 0.8))));
                 }
-              });
-            } else if (proj.type === 'tomato') {
-              activeEnemiesPositions.forEach((enemy) => {
-                if (enemy.dead || enemy.position.distanceTo(proj.lastTargetPos) > 1.8) return;
-                damageEnemy(enemy.id, proj.damage);
-                slowEnemy(enemy.id, TOWER_TYPES.tomato.slowMultiplier, TOWER_TYPES.tomato.slowDurationMs);
               });
             } else {
               // Single target damage
@@ -169,7 +169,7 @@ export default function ProjectileSystem() {
             idxCannon++;
           }
         } else {
-          tempScale.set(0.13 * proj.level, 0.13 * proj.level, 0.72 * proj.level);
+          tempScale.set(0.72 * proj.level, 0.13 * proj.level, 0.13 * proj.level);
           tempMatrix.compose(tempPosition, tempRotation, tempScale);
           if (tomatoMeshRef.current) {
             tomatoMeshRef.current.setMatrixAt(idxTomato, tempMatrix);

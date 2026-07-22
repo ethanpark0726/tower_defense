@@ -472,8 +472,7 @@ export default function EnemyManager() {
         hp: enemy.hp,
         maxHp: enemy.maxHp,
         size: enemy.size,
-        type: enemy.type,
-        slowed: isSlowed
+        type: enemy.type
       });
 
       if (isSlowed && ketchupRingRef.current) {
