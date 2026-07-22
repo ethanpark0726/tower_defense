@@ -172,6 +172,16 @@ export const TOWER_TYPES = {
     color: '#45b649',
     description: 'Launches broccoli bursts that splash nearby snacks.'
   },
+  tomato: {
+    name: 'Tomato Splash',
+    cost: 150,
+    range: 6.5,
+    damage: 42,
+    fireRate: 1.25,
+    attackStyle: 'splash',
+    color: '#ef4444',
+    description: 'Splashes tomato bursts that hit clustered snacks.'
+  },
   tesla: {
     name: 'Milk Beam',
     cost: 250,

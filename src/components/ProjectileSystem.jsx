@@ -9,7 +9,7 @@ import { triggerExplosion } from './ParticleSystem';
 const POOL_SIZE = 150;
 const projectilePool = Array.from({ length: POOL_SIZE }, () => ({
   active: false,
-  type: 'laser', // laser | cannon | tesla
+  type: 'laser', // laser | cannon | tomato | tesla
   position: new THREE.Vector3(),
   targetId: null,
   lastTargetPos: new THREE.Vector3(), // fall back if target disappears
@@ -33,6 +33,7 @@ export default function ProjectileSystem() {
   // Instanced Meshes references
   const laserMeshRef = useRef();
   const cannonMeshRef = useRef();
+  const tomatoMeshRef = useRef();
   const teslaMeshRef = useRef(); // Stretched beam mesh
 
   useEffect(() => {
@@ -71,6 +72,8 @@ export default function ProjectileSystem() {
         proj.speed = 18.0;
       } else if (type === 'cannon') {
         proj.speed = 9.0;
+      } else if (type === 'tomato') {
+        proj.speed = 12.0;
       }
     };
 
@@ -84,6 +87,7 @@ export default function ProjectileSystem() {
     
     let idxLaser = 0;
     let idxCannon = 0;
+    let idxTomato = 0;
     let idxTesla = 0;
 
     const tempMatrix = new THREE.Matrix4();
@@ -94,8 +98,8 @@ export default function ProjectileSystem() {
     projectilePool.forEach((proj) => {
       if (!proj.active) return;
 
-      // Handle standard physical flight projectiles (Laser, Cannon)
-      if (proj.type === 'laser' || proj.type === 'cannon') {
+      // Handle standard physical flight projectiles
+      if (proj.type === 'laser' || proj.type === 'cannon' || proj.type === 'tomato') {
         // Trace current position of target
         const targetData = activeEnemiesPositions.get(proj.targetId);
         if (targetData && !targetData.dead) {
@@ -109,13 +113,14 @@ export default function ProjectileSystem() {
           // Impact reached!
           if (targetData && !targetData.dead) {
             // Apply damage
-            if (proj.type === 'cannon') {
+            if (proj.type === 'cannon' || proj.type === 'tomato') {
               // AoE damage check: damage all enemies near impact zone
+              const splashRadius = proj.type === 'tomato' ? 1.8 : 2.2;
               activeEnemiesPositions.forEach((enemy) => {
                 if (enemy.dead) return;
                 const distToImpact = enemy.position.distanceTo(proj.lastTargetPos);
-                if (distToImpact <= 2.2) { // Splash radius 2.2 units
-                  damageEnemy(enemy.id, Math.round(proj.damage * (1 - distToImpact / 3)));
+                if (distToImpact <= splashRadius) {
+                  damageEnemy(enemy.id, Math.round(proj.damage * (1 - distToImpact / (splashRadius + 0.8))));
                 }
               });
             } else {
@@ -149,12 +154,19 @@ export default function ProjectileSystem() {
             laserMeshRef.current.setMatrixAt(idxLaser, tempMatrix);
             idxLaser++;
           }
-        } else { // cannon
+        } else if (proj.type === 'cannon') {
           tempScale.set(0.3 * proj.level, 0.3 * proj.level, 0.3 * proj.level);
           tempMatrix.compose(tempPosition, tempRotation, tempScale);
           if (cannonMeshRef.current) {
             cannonMeshRef.current.setMatrixAt(idxCannon, tempMatrix);
             idxCannon++;
+          }
+        } else {
+          tempScale.set(0.24 * proj.level, 0.24 * proj.level, 0.24 * proj.level);
+          tempMatrix.compose(tempPosition, tempRotation, tempScale);
+          if (tomatoMeshRef.current) {
+            tomatoMeshRef.current.setMatrixAt(idxTomato, tempMatrix);
+            idxTomato++;
           }
         }
       }
@@ -217,6 +229,13 @@ export default function ProjectileSystem() {
       cannonMeshRef.current.instanceMatrix.needsUpdate = true;
     }
 
+    if (tomatoMeshRef.current) {
+      for (let i = idxTomato; i < POOL_SIZE; i++) {
+        tomatoMeshRef.current.setMatrixAt(i, hideMatrix);
+      }
+      tomatoMeshRef.current.instanceMatrix.needsUpdate = true;
+    }
+
     if (teslaMeshRef.current) {
       for (let i = idxTesla; i < POOL_SIZE; i++) {
         teslaMeshRef.current.setMatrixAt(i, hideMatrix);
@@ -241,6 +260,15 @@ export default function ProjectileSystem() {
         <sphereGeometry args={[1.0, 16, 16]} />
         <meshBasicMaterial
           color="#45b649"
+          toneMapped={false}
+        />
+      </instancedMesh>
+
+      {/* Tomato splashes */}
+      <instancedMesh ref={tomatoMeshRef} args={[null, null, POOL_SIZE]} frustumCulled={false}>
+        <sphereGeometry args={[1.0, 16, 16]} />
+        <meshBasicMaterial
+          color="#ef4444"
           toneMapped={false}
         />
       </instancedMesh>

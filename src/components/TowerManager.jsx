@@ -142,6 +142,65 @@ function BroccoliBomber({ level, headRef, muzzleRef }) {
   );
 }
 
+function TomatoSplash({ level, headRef, muzzleRef }) {
+  const scale = 1 + (level - 1) * 0.12;
+
+  return (
+    <group scale={[scale, scale, scale]}>
+      <mesh castShadow receiveShadow>
+        <cylinderGeometry args={[0.7, 0.78, 0.2, 16]} />
+        <meshStandardMaterial color="#ffe4c7" roughness={0.8} />
+      </mesh>
+      <mesh position={[0, 0.32, 0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.24, 0.55, 12]} />
+        <meshStandardMaterial color="#4d7c0f" roughness={0.78} />
+      </mesh>
+
+      <group position={[0, 0.82, 0]} ref={headRef}>
+        <mesh position={[0, 0, 0.12]} scale={[1, 0.88, 1]} castShadow>
+          <sphereGeometry args={[0.48, 20, 16]} />
+          <meshStandardMaterial color="#ef4444" roughness={0.62} />
+        </mesh>
+        {[0, 1, 2, 3, 4].map((index) => (
+          <mesh
+            key={index}
+            position={[0, 0.42, 0.1]}
+            rotation={[0.55, (index / 5) * Math.PI * 2, 0]}
+            castShadow
+          >
+            <coneGeometry args={[0.09, 0.34, 8]} />
+            <meshStandardMaterial color="#65a30d" roughness={0.75} />
+          </mesh>
+        ))}
+        {[-0.14, 0.14].map((x) => (
+          <mesh key={x} position={[x, 0.05, 0.56]}>
+            <sphereGeometry args={[0.047, 10, 10]} />
+            <meshBasicMaterial color="#3f1010" />
+          </mesh>
+        ))}
+        <mesh position={[0, -0.08, 0.58]}>
+          <boxGeometry args={[0.16, 0.03, 0.025]} />
+          <meshBasicMaterial color="#3f1010" />
+        </mesh>
+        <group ref={muzzleRef} position={[0, -0.02, 0.68]} />
+      </group>
+
+      {level >= 2 && (
+        <mesh position={[0, 0.16, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.58, 0.04, 8, 24]} />
+          <meshStandardMaterial color="#f97316" emissive="#ef4444" emissiveIntensity={0.18} />
+        </mesh>
+      )}
+      {level === 3 && (
+        <mesh position={[0, 1.3, 0]}>
+          <sphereGeometry args={[0.16, 12, 10]} />
+          <meshStandardMaterial color="#ffd166" emissive="#f97316" emissiveIntensity={0.35} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
 function MilkBeam({ level, headRef, muzzleRef }) {
   const scale = 1 + (level - 1) * 0.12;
 
@@ -271,6 +330,9 @@ function HealthyFoodTower({ tower }) {
     }
     if (tower.type === 'cannon') {
       return <BroccoliBomber level={tower.level} headRef={headRef} muzzleRef={muzzleRef} />;
+    }
+    if (tower.type === 'tomato') {
+      return <TomatoSplash level={tower.level} headRef={headRef} muzzleRef={muzzleRef} />;
     }
     if (tower.type === 'tesla') {
       return <MilkBeam level={tower.level} headRef={headRef} muzzleRef={muzzleRef} />;
