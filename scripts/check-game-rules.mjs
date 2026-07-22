@@ -3,6 +3,7 @@ import {
   DIFFICULTIES,
   TOTAL_WAVES,
   getBoardRouteWave,
+  getEnemyMoveSpeed,
   getEnemyStatsForWave,
   getRouteForWave,
   isCellOnPath,
@@ -42,9 +43,13 @@ assert.ok(DIFFICULTIES.challenge.startingLives <= 12, 'Challenge should start wi
 assert.ok(DIFFICULTIES.challenge.spawnDelay <= 0.6, 'Challenge snacks should spawn closer together.');
 
 assert.equal(TOWER_TYPES.tomato.name, 'Tomato Splash', 'Tomato Splash should be available as a defender.');
-assert.equal(TOWER_TYPES.tomato.attackStyle, 'splash', 'Tomato Splash should hit clustered snacks.');
+assert.equal(TOWER_TYPES.tomato.attackStyle, 'ketchup', 'Tomato Splash should spray slowing ketchup.');
 assert.ok(TOWER_TYPES.tomato.cost > TOWER_TYPES.laser.cost, 'Tomato Splash should cost more than Carrot Shooter.');
 assert.ok(TOWER_TYPES.tomato.cost < TOWER_TYPES.cannon.cost, 'Tomato Splash should be cheaper than Broccoli Bomber.');
+
+const ketchupTarget = { speed: 4, slowMultiplier: 0.75, slowUntil: 2_000 };
+assert.equal(getEnemyMoveSpeed(ketchupTarget, 1_500), 3, 'Fresh ketchup should slow a snack by 25%.');
+assert.equal(getEnemyMoveSpeed(ketchupTarget, 2_000), 4, 'A snack should recover when the ketchup slow expires.');
 
 const normalSnack = getEnemyStatsForWave(1, 'normal', 'normal');
 const challengeSnack = getEnemyStatsForWave(1, 'normal', 'challenge');

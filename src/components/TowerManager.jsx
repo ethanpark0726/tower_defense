@@ -182,7 +182,15 @@ function TomatoSplash({ level, headRef, muzzleRef }) {
           <boxGeometry args={[0.16, 0.03, 0.025]} />
           <meshBasicMaterial color="#3f1010" />
         </mesh>
-        <group ref={muzzleRef} position={[0, -0.02, 0.68]} />
+        <mesh position={[0, -0.02, 0.75]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.08, 0.15, 0.38, 12]} />
+          <meshStandardMaterial color="#b91c1c" roughness={0.55} />
+        </mesh>
+        <mesh position={[0, -0.02, 0.96]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.055, 0.075, 0.12, 10]} />
+          <meshStandardMaterial color="#fca5a5" roughness={0.45} />
+        </mesh>
+        <group ref={muzzleRef} position={[0, -0.02, 1.04]} />
       </group>
 
       {level >= 2 && (

@@ -13,6 +13,15 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.15.0] - 2026-07-21
+
+### Changed
+
+- Reframed the playfield as a friendly lion's open mouth with a warm mane, ears, muzzle, eyes, fangs, and rounded teeth.
+- Changed Tomato Splash from a second bomb tower into a ketchup sprayer with lower damage and a brief area slow.
+- Added visible ketchup streams, hit splashes, and red slow rings around affected snacks.
+- Restored the original friendly tooth goal so the board redesign remains the focus.
+
 ## [1.14.0] - 2026-07-21
 
 ### Changed

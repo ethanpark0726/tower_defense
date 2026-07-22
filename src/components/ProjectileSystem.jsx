@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useGameStore } from '../gameStore';
+import { TOWER_TYPES, useGameStore } from '../gameStore';
 import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { triggerExplosion } from './ParticleSystem';
 
@@ -29,6 +29,7 @@ export let fireProjectile = null;
 
 export default function ProjectileSystem() {
   const damageEnemy = useGameStore(state => state.damageEnemy);
+  const slowEnemy = useGameStore(state => state.slowEnemy);
 
   // Instanced Meshes references
   const laserMeshRef = useRef();
@@ -111,11 +112,17 @@ export default function ProjectileSystem() {
 
         if (step >= dist) {
           // Impact reached!
-          if (targetData && !targetData.dead) {
+          if (proj.type === 'tomato') {
+            activeEnemiesPositions.forEach((enemy) => {
+              if (enemy.dead || enemy.position.distanceTo(proj.lastTargetPos) > 1.8) return;
+              damageEnemy(enemy.id, proj.damage);
+              slowEnemy(enemy.id, TOWER_TYPES.tomato.slowMultiplier, TOWER_TYPES.tomato.slowDurationMs);
+            });
+          } else if (targetData && !targetData.dead) {
             // Apply damage
-            if (proj.type === 'cannon' || proj.type === 'tomato') {
+            if (proj.type === 'cannon') {
               // AoE damage check: damage all enemies near impact zone
-              const splashRadius = proj.type === 'tomato' ? 1.8 : 2.2;
+              const splashRadius = 2.2;
               activeEnemiesPositions.forEach((enemy) => {
                 if (enemy.dead) return;
                 const distToImpact = enemy.position.distanceTo(proj.lastTargetPos);
@@ -162,7 +169,7 @@ export default function ProjectileSystem() {
             idxCannon++;
           }
         } else {
-          tempScale.set(0.24 * proj.level, 0.24 * proj.level, 0.24 * proj.level);
+          tempScale.set(0.72 * proj.level, 0.13 * proj.level, 0.13 * proj.level);
           tempMatrix.compose(tempPosition, tempRotation, tempScale);
           if (tomatoMeshRef.current) {
             tomatoMeshRef.current.setMatrixAt(idxTomato, tempMatrix);
