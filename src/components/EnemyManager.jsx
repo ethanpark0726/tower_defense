@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { getRouteForWave, useGameStore } from '../gameStore';
+import { getEnemyMoveSpeed, getRouteForWave, useGameStore } from '../gameStore';
 import { activeEnemiesPositions } from '../activeEnemyRegistry';
 import { triggerExplosion } from './ParticleSystem';
 
@@ -22,6 +22,9 @@ const WRAPPER_LEFT_ROTATION = new THREE.Quaternion().setFromEuler(
 );
 const WRAPPER_RIGHT_ROTATION = new THREE.Quaternion().setFromEuler(
   new THREE.Euler(0, 0, -Math.PI / 2)
+);
+const KETCHUP_RING_ROTATION = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(Math.PI / 2, 0, 0)
 );
 
 const calculatePathLength = (route) => {
@@ -93,6 +96,7 @@ export default function EnemyManager() {
 
   const hpBackgroundRef = useRef();
   const hpForegroundRef = useRef();
+  const ketchupRingRef = useRef();
 
   const waveElapsedTime = useRef(0);
   const localEnemiesData = useRef(new Map());
@@ -146,6 +150,7 @@ export default function EnemyManager() {
     let jellyEyeIndex = 0;
     let jellyMouthIndex = 0;
     let healthBarIndex = 0;
+    let ketchupRingIndex = 0;
 
     activeEnemiesPositions.clear();
 
@@ -163,6 +168,7 @@ export default function EnemyManager() {
     const healthBarRotation = new THREE.Quaternion();
     const route = getRouteForWave(wave || 1);
     const pathTotalLength = calculatePathLength(route);
+    const now = Date.now();
 
     const placeComponent = (
       meshRef,
@@ -205,7 +211,8 @@ export default function EnemyManager() {
         localEnemiesData.current.set(enemy.id, localData);
       }
 
-      localData.distanceTraveled += frameDelta * enemy.speed;
+      const isSlowed = (enemy.slowUntil ?? 0) > now;
+      localData.distanceTraveled += frameDelta * getEnemyMoveSpeed(enemy, now);
 
       if (localData.distanceTraveled >= pathTotalLength) {
         leakEnemy(enemy.id);
@@ -465,8 +472,16 @@ export default function EnemyManager() {
         hp: enemy.hp,
         maxHp: enemy.maxHp,
         size: enemy.size,
-        type: enemy.type
+        type: enemy.type,
+        slowed: isSlowed
       });
+
+      if (isSlowed && ketchupRingRef.current) {
+        componentPosition.set(basePosition.x, 0.14, basePosition.z);
+        scale.set(enemy.size * 1.15, enemy.size * 1.15, enemy.size * 1.15);
+        matrix.compose(componentPosition, KETCHUP_RING_ROTATION, scale);
+        ketchupRingRef.current.setMatrixAt(ketchupRingIndex++, matrix);
+      }
 
       healthBarPosition.copy(basePosition).addScaledVector(Y_AXIS, healthBarHeight);
       lookDirection.subVectors(state.camera.position, healthBarPosition).normalize();
@@ -522,6 +537,7 @@ export default function EnemyManager() {
 
     hideUnusedInstances(hpBackgroundRef, healthBarIndex, MAX_HEALTH_BAR_INSTANCES);
     hideUnusedInstances(hpForegroundRef, healthBarIndex, MAX_HEALTH_BAR_INSTANCES);
+    hideUnusedInstances(ketchupRingRef, ketchupRingIndex, MAX_HEALTH_BAR_INSTANCES);
   });
 
   return (
@@ -603,6 +619,12 @@ export default function EnemyManager() {
       <instancedMesh ref={hpForegroundRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#6ee7b7" />
+      </instancedMesh>
+
+      {/* Ketchup slow markers */}
+      <instancedMesh ref={ketchupRingRef} args={[null, null, MAX_HEALTH_BAR_INSTANCES]} frustumCulled={false}>
+        <torusGeometry args={[0.62, 0.1, 8, 24]} />
+        <meshBasicMaterial color="#ef4444" transparent opacity={0.72} toneMapped={false} />
       </instancedMesh>
     </group>
   );

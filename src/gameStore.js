@@ -176,11 +176,13 @@ export const TOWER_TYPES = {
     name: 'Tomato Splash',
     cost: 150,
     range: 6.5,
-    damage: 42,
-    fireRate: 1.25,
-    attackStyle: 'splash',
+    damage: 24,
+    fireRate: 1.6,
+    attackStyle: 'ketchup',
+    slowMultiplier: 0.75,
+    slowDurationMs: 1500,
     color: '#ef4444',
-    description: 'Splashes tomato bursts that hit clustered snacks.'
+    description: 'Sprays ketchup that briefly slows nearby snacks.'
   },
   tesla: {
     name: 'Milk Beam',
@@ -255,6 +257,12 @@ export const getEnemyStatsForWave = (wave, type, difficulty = 'normal') => {
     theme: typeData.theme
   };
 };
+
+export const getEnemyMoveSpeed = (enemy, now = Date.now()) => (
+  (enemy.slowUntil ?? 0) > now
+    ? enemy.speed * (enemy.slowMultiplier ?? 1)
+    : enemy.speed
+);
 
 let feedbackSequence = 0;
 const createFeedbackEvent = (type) => ({ id: ++feedbackSequence, type });
@@ -574,6 +582,27 @@ export const useGameStore = create((set, get) => ({
         ...(feedbackType && { feedbackEvent: createFeedbackEvent(feedbackType) })
       };
     });
+  },
+
+  slowEnemy: (id, multiplier, durationMs) => {
+    const now = Date.now();
+    const slowUntil = now + durationMs;
+
+    set((state) => ({
+      enemies: state.enemies.map((enemy) => {
+        if (enemy.id !== id || enemy.dead || enemy.reachedEnd) return enemy;
+
+        const activeMultiplier = (enemy.slowUntil ?? 0) > now
+          ? enemy.slowMultiplier ?? 1
+          : 1;
+
+        return {
+          ...enemy,
+          slowMultiplier: Math.min(activeMultiplier, multiplier),
+          slowUntil: Math.max(enemy.slowUntil ?? 0, slowUntil)
+        };
+      })
+    }));
   },
   
   leakEnemy: (id) => {

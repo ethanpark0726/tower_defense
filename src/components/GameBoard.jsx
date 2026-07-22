@@ -34,19 +34,15 @@ const createRoundedRectangle = (width, height, radius) => {
 
 const MOUTH_CAVITY_SHAPE = createRoundedRectangle(27, 23, 6);
 const TONGUE_SHAPE = createRoundedRectangle(24, 21, 5);
-const TOOTH_GOAL_SHAPE = new THREE.Shape();
-TOOTH_GOAL_SHAPE.moveTo(-0.85, 0.35);
-TOOTH_GOAL_SHAPE.bezierCurveTo(-1.0, 0.78, -0.92, 1.25, -0.55, 1.25);
-TOOTH_GOAL_SHAPE.bezierCurveTo(-0.32, 1.25, -0.22, 1.05, 0, 1.05);
-TOOTH_GOAL_SHAPE.bezierCurveTo(0.22, 1.05, 0.32, 1.25, 0.55, 1.25);
-TOOTH_GOAL_SHAPE.bezierCurveTo(0.92, 1.25, 1.0, 0.78, 0.85, 0.35);
-TOOTH_GOAL_SHAPE.bezierCurveTo(0.78, -0.05, 0.64, -0.25, 0.56, -0.72);
-TOOTH_GOAL_SHAPE.bezierCurveTo(0.49, -1.12, 0.3, -1.18, 0.14, -0.72);
-TOOTH_GOAL_SHAPE.quadraticCurveTo(0, -0.38, -0.14, -0.72);
-TOOTH_GOAL_SHAPE.bezierCurveTo(-0.3, -1.18, -0.49, -1.12, -0.56, -0.72);
-TOOTH_GOAL_SHAPE.bezierCurveTo(-0.64, -0.25, -0.78, -0.05, -0.85, 0.35);
-TOOTH_GOAL_SHAPE.closePath();
-const TOOTH_EXTRUDE_SETTINGS = { depth: 0.5, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.12, bevelThickness: 0.12 };
+const LION_TOOTH_SHAPE = new THREE.Shape();
+LION_TOOTH_SHAPE.moveTo(-0.44, -0.34);
+LION_TOOTH_SHAPE.quadraticCurveTo(-0.52, 0.2, -0.36, 0.54);
+LION_TOOTH_SHAPE.quadraticCurveTo(-0.18, 0.72, 0, 0.55);
+LION_TOOTH_SHAPE.quadraticCurveTo(0.18, 0.72, 0.36, 0.54);
+LION_TOOTH_SHAPE.quadraticCurveTo(0.52, 0.2, 0.44, -0.34);
+LION_TOOTH_SHAPE.quadraticCurveTo(0, -0.5, -0.44, -0.34);
+LION_TOOTH_SHAPE.closePath();
+const LION_TOOTH_EXTRUDE = { depth: 0.38, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.06, bevelThickness: 0.06 };
 const TOOTH_ROW_X = [-8, -6, -4, -2, 0, 2, 4, 6, 8];
 const MAP_DECORATIONS = {
   gum_garden: {
@@ -156,33 +152,33 @@ function CandyGate() {
 
 function ToothGoal() {
   return (
-    <group position={[11, 1.25, 5]} scale={1.12}>
-      <mesh position={[0, 0, -0.18]} castShadow raycast={disableRaycast}>
-        <extrudeGeometry args={[TOOTH_GOAL_SHAPE, TOOTH_EXTRUDE_SETTINGS]} />
-        <meshStandardMaterial color="#fffdf4" roughness={0.3} emissive="#fff7d6" emissiveIntensity={0.08} />
+    <group position={[11, 1.15, 5]}>
+      <mesh position={[0, 0.25, 0]} scale={[1.0, 1.05, 0.72]} castShadow raycast={disableRaycast}>
+        <sphereGeometry args={[0.92, 32, 32]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.28} emissive="#fff7d6" emissiveIntensity={0.08} />
       </mesh>
-      <mesh position={[-0.3, 0.47, 0.47]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.085, 12, 12]} />
+      <mesh position={[-0.36, -0.55, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
+        <coneGeometry args={[0.38, 1.15, 20]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.3} />
+      </mesh>
+      <mesh position={[0.36, -0.55, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
+        <coneGeometry args={[0.38, 1.15, 20]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.3} />
+      </mesh>
+      <mesh position={[-0.29, 0.42, 0.69]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.075, 12, 12]} />
         <meshBasicMaterial color="#364153" />
       </mesh>
-      <mesh position={[0.3, 0.47, 0.47]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.085, 12, 12]} />
+      <mesh position={[0.29, 0.42, 0.69]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.075, 12, 12]} />
         <meshBasicMaterial color="#364153" />
       </mesh>
-      <mesh position={[-0.55, 0.25, 0.46]} scale={[1.5, 0.65, 0.35]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.09, 12, 12]} />
-        <meshBasicMaterial color="#ff9eb5" transparent opacity={0.78} />
-      </mesh>
-      <mesh position={[0.55, 0.25, 0.46]} scale={[1.5, 0.65, 0.35]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.09, 12, 12]} />
-        <meshBasicMaterial color="#ff9eb5" transparent opacity={0.78} />
-      </mesh>
-      <mesh position={[0, 0.13, 0.49]} rotation={[0, 0, Math.PI]} raycast={disableRaycast}>
-        <torusGeometry args={[0.18, 0.04, 8, 24, Math.PI]} />
+      <mesh position={[0, 0.12, 0.71]} scale={[1.5, 0.5, 0.35]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.14, 16, 16]} />
         <meshBasicMaterial color="#ff7096" />
       </mesh>
-      <mesh position={[0, -1.25, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={disableRaycast}>
-        <torusGeometry args={[1.15, 0.08, 12, 48]} />
+      <mesh position={[0, -1.12, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={disableRaycast}>
+        <torusGeometry args={[1.1, 0.08, 12, 48]} />
         <meshBasicMaterial color="#7bdff2" transparent opacity={0.75} />
       </mesh>
       <pointLight position={[0, 1.2, 1]} color="#fff4b8" intensity={1.2} distance={5} />
@@ -191,25 +187,18 @@ function ToothGoal() {
 }
 
 function DecorativeTooth({ x, z, front, index }) {
-  const toothScale = index === 4 ? 1.12 : 0.9 + (index % 2) * 0.08;
+  const isFang = index === 1 || index === 7;
+  const toothScale = index === 4 ? 1.12 : 0.92 + (index % 2) * 0.08;
 
   return (
     <group
-      position={[x, 0.18, z]}
+      position={[x, isFang ? 0.62 : 0.48, z]}
       rotation={[0, front ? Math.PI : 0, (index - 4) * 0.018]}
-      scale={toothScale}
+      scale={[toothScale, toothScale * (isFang ? 1.65 : 1), toothScale]}
     >
-      <mesh position={[0, 0.58, 0]} scale={[0.62, 0.7, 0.48]} castShadow raycast={disableRaycast}>
-        <sphereGeometry args={[0.78, 18, 18]} />
-        <meshStandardMaterial color="#fffaf0" roughness={0.32} emissive="#fff4cf" emissiveIntensity={0.04} />
-      </mesh>
-      <mesh position={[-0.22, 0.05, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
-        <coneGeometry args={[0.23, 0.7, 14]} />
-        <meshStandardMaterial color="#fffaf0" roughness={0.36} />
-      </mesh>
-      <mesh position={[0.22, 0.05, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
-        <coneGeometry args={[0.23, 0.7, 14]} />
-        <meshStandardMaterial color="#fffaf0" roughness={0.36} />
+      <mesh castShadow raycast={disableRaycast}>
+        <extrudeGeometry args={[LION_TOOTH_SHAPE, LION_TOOTH_EXTRUDE]} />
+        <meshStandardMaterial color="#fffaf0" roughness={0.28} emissive="#fff4cf" emissiveIntensity={0.05} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -218,6 +207,24 @@ function DecorativeTooth({ x, z, front, index }) {
 function MouthEnvironment({ theme }) {
   return (
     <group>
+      <mesh position={[0, -0.7, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1.3, 1, 0.82]} receiveShadow raycast={disableRaycast}>
+        <torusGeometry args={[10.1, 1.55, 20, 96]} />
+        <meshStandardMaterial color="#8b451f" roughness={0.92} />
+      </mesh>
+
+      {[[-10.4, -8.6], [10.4, -8.6]].map(([x, z]) => (
+        <group key={`lion_ear_${x}`} position={[x, -0.05, z]}>
+          <mesh scale={[1.55, 0.55, 1.35]} castShadow raycast={disableRaycast}>
+            <sphereGeometry args={[1, 24, 18]} />
+            <meshStandardMaterial color="#d9902f" roughness={0.82} />
+          </mesh>
+          <mesh position={[0, 0.34, 0.08]} scale={[0.8, 0.22, 0.68]} raycast={disableRaycast}>
+            <sphereGeometry args={[1, 20, 16]} />
+            <meshStandardMaterial color="#8b451f" roughness={0.88} />
+          </mesh>
+        </group>
+      ))}
+
       <mesh position={[0, -0.42, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow raycast={disableRaycast}>
         <shapeGeometry args={[MOUTH_CAVITY_SHAPE]} />
         <meshStandardMaterial color={theme.mouth} roughness={0.88} />
@@ -237,6 +244,23 @@ function MouthEnvironment({ theme }) {
       <mesh position={[0, -0.38, 0.35]} scale={[10.8, 0.22, 8.4]} receiveShadow raycast={disableRaycast}>
         <sphereGeometry args={[1, 40, 28]} />
         <meshStandardMaterial color="#e97b8d" roughness={0.78} />
+      </mesh>
+
+      {[-3.3, 3.3].map((x) => (
+        <mesh key={`lion_eye_${x}`} position={[x, 0.72, -10.2]} scale={[1.2, 0.8, 0.55]} castShadow raycast={disableRaycast}>
+          <sphereGeometry args={[0.42, 20, 16]} />
+          <meshStandardMaterial color="#3b2417" roughness={0.42} />
+        </mesh>
+      ))}
+      {[-1.25, 1.25].map((x) => (
+        <mesh key={`lion_muzzle_${x}`} position={[x, 0.4, -10.15]} scale={[1.65, 0.52, 1.02]} castShadow raycast={disableRaycast}>
+          <sphereGeometry args={[1, 24, 18]} />
+          <meshStandardMaterial color="#f3c879" roughness={0.76} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.08, -9.72]} scale={[1.15, 0.5, 0.68]} castShadow raycast={disableRaycast}>
+        <sphereGeometry args={[0.62, 24, 18]} />
+        <meshStandardMaterial color="#5a2d1b" roughness={0.5} />
       </mesh>
 
       <mesh position={[0, 0.02, -9.55]} scale={[9.2, 0.58, 1.08]} receiveShadow raycast={disableRaycast}>
