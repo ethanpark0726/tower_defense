@@ -34,6 +34,19 @@ const createRoundedRectangle = (width, height, radius) => {
 
 const MOUTH_CAVITY_SHAPE = createRoundedRectangle(27, 23, 6);
 const TONGUE_SHAPE = createRoundedRectangle(24, 21, 5);
+const TOOTH_GOAL_SHAPE = new THREE.Shape();
+TOOTH_GOAL_SHAPE.moveTo(-0.85, 0.35);
+TOOTH_GOAL_SHAPE.bezierCurveTo(-1.0, 0.78, -0.92, 1.25, -0.55, 1.25);
+TOOTH_GOAL_SHAPE.bezierCurveTo(-0.32, 1.25, -0.22, 1.05, 0, 1.05);
+TOOTH_GOAL_SHAPE.bezierCurveTo(0.22, 1.05, 0.32, 1.25, 0.55, 1.25);
+TOOTH_GOAL_SHAPE.bezierCurveTo(0.92, 1.25, 1.0, 0.78, 0.85, 0.35);
+TOOTH_GOAL_SHAPE.bezierCurveTo(0.78, -0.05, 0.64, -0.25, 0.56, -0.72);
+TOOTH_GOAL_SHAPE.bezierCurveTo(0.49, -1.12, 0.3, -1.18, 0.14, -0.72);
+TOOTH_GOAL_SHAPE.quadraticCurveTo(0, -0.38, -0.14, -0.72);
+TOOTH_GOAL_SHAPE.bezierCurveTo(-0.3, -1.18, -0.49, -1.12, -0.56, -0.72);
+TOOTH_GOAL_SHAPE.bezierCurveTo(-0.64, -0.25, -0.78, -0.05, -0.85, 0.35);
+TOOTH_GOAL_SHAPE.closePath();
+const TOOTH_EXTRUDE_SETTINGS = { depth: 0.5, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.12, bevelThickness: 0.12 };
 const TOOTH_ROW_X = [-8, -6, -4, -2, 0, 2, 4, 6, 8];
 const MAP_DECORATIONS = {
   gum_garden: {
@@ -143,33 +156,33 @@ function CandyGate() {
 
 function ToothGoal() {
   return (
-    <group position={[11, 1.15, 5]}>
-      <mesh position={[0, 0.25, 0]} scale={[1.0, 1.05, 0.72]} castShadow raycast={disableRaycast}>
-        <sphereGeometry args={[0.92, 32, 32]} />
-        <meshStandardMaterial color="#fffdf4" roughness={0.28} emissive="#fff7d6" emissiveIntensity={0.08} />
+    <group position={[11, 1.25, 5]} scale={1.12}>
+      <mesh position={[0, 0, -0.18]} castShadow raycast={disableRaycast}>
+        <extrudeGeometry args={[TOOTH_GOAL_SHAPE, TOOTH_EXTRUDE_SETTINGS]} />
+        <meshStandardMaterial color="#fffdf4" roughness={0.3} emissive="#fff7d6" emissiveIntensity={0.08} />
       </mesh>
-      <mesh position={[-0.36, -0.55, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
-        <coneGeometry args={[0.38, 1.15, 20]} />
-        <meshStandardMaterial color="#fffdf4" roughness={0.3} />
-      </mesh>
-      <mesh position={[0.36, -0.55, 0]} rotation={[0, 0, Math.PI]} castShadow raycast={disableRaycast}>
-        <coneGeometry args={[0.38, 1.15, 20]} />
-        <meshStandardMaterial color="#fffdf4" roughness={0.3} />
-      </mesh>
-      <mesh position={[-0.29, 0.42, 0.69]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.075, 12, 12]} />
+      <mesh position={[-0.3, 0.47, 0.47]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.085, 12, 12]} />
         <meshBasicMaterial color="#364153" />
       </mesh>
-      <mesh position={[0.29, 0.42, 0.69]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.075, 12, 12]} />
+      <mesh position={[0.3, 0.47, 0.47]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.085, 12, 12]} />
         <meshBasicMaterial color="#364153" />
       </mesh>
-      <mesh position={[0, 0.12, 0.71]} scale={[1.5, 0.5, 0.35]} raycast={disableRaycast}>
-        <sphereGeometry args={[0.14, 16, 16]} />
+      <mesh position={[-0.55, 0.25, 0.46]} scale={[1.5, 0.65, 0.35]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.09, 12, 12]} />
+        <meshBasicMaterial color="#ff9eb5" transparent opacity={0.78} />
+      </mesh>
+      <mesh position={[0.55, 0.25, 0.46]} scale={[1.5, 0.65, 0.35]} raycast={disableRaycast}>
+        <sphereGeometry args={[0.09, 12, 12]} />
+        <meshBasicMaterial color="#ff9eb5" transparent opacity={0.78} />
+      </mesh>
+      <mesh position={[0, 0.13, 0.49]} rotation={[0, 0, Math.PI]} raycast={disableRaycast}>
+        <torusGeometry args={[0.18, 0.04, 8, 24, Math.PI]} />
         <meshBasicMaterial color="#ff7096" />
       </mesh>
-      <mesh position={[0, -1.12, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={disableRaycast}>
-        <torusGeometry args={[1.1, 0.08, 12, 48]} />
+      <mesh position={[0, -1.25, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={disableRaycast}>
+        <torusGeometry args={[1.15, 0.08, 12, 48]} />
         <meshBasicMaterial color="#7bdff2" transparent opacity={0.75} />
       </mesh>
       <pointLight position={[0, 1.2, 1]} color="#fff4b8" intensity={1.2} distance={5} />
