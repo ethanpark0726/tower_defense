@@ -13,8 +13,8 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 ## Feature Highlights
 
 - Tooth-defense theme with chocolate, candy, and jelly snacks attacking a friendly tooth.
-- Friendly molar goal with a rounded crown, connected roots, and a cheerful face.
-- Healthy-food defenders including Carrot Shooter, Broccoli Bomber, Tomato Splash, and Milk Beam.
+- Friendly lion-mouth board with a warm mane, muzzle, fangs, and rounded teeth.
+- Healthy-food defenders including a slowing Tomato Ketchup sprayer.
 - Rotating mouth-zone maps for Gum Garden, Calcium Cove, and Plaque Patrol.
 - One route for Waves 1-10 and a second route for Waves 11-20.
 - Easy, Normal, and Challenge patrol difficulty choices.
@@ -39,7 +39,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 13: extended waves and tougher Challenge patrol - complete
 - Phase 14: two-route stage variety for early and late waves - complete
 - Phase 15: Tomato Splash defender - complete
-- Phase 16: friendly tooth character redesign - in review
+- Phase 16: friendly lion-mouth board and Tomato Ketchup slow - in review
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
