@@ -13,6 +13,14 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.14.0] - 2026-07-21
+
+### Changed
+
+- Rebuilt the friendly tooth goal with a recognizable rounded molar silhouette.
+- Connected the crown and roots into one beveled model and added a cheerful smile and cheeks.
+- Kept the larger tooth clear of the snack route and HUD from the default player camera.
+
 ## [1.13.0] - 2026-07-21
 
 ### Added
