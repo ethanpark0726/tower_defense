@@ -32,6 +32,10 @@ export default function ParticleSystem() {
         numParticles = 25; // larger explosion
         explosionSpeed = 6.0;
         particleColors = ['#2f9e44', '#66bb45', '#d9f99d', '#fff4d6'];
+      } else if (type === 'tomato') {
+        numParticles = 20;
+        explosionSpeed = 5.2;
+        particleColors = ['#ef4444', '#f97316', '#fecaca', '#fff4d6'];
       } else if (type === 'tesla') {
         numParticles = 16;
         explosionSpeed = 4.5;

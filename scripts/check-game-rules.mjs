@@ -7,6 +7,7 @@ import {
   getRouteForWave,
   isCellOnPath,
   ROUTE_LAYOUTS,
+  TOWER_TYPES,
   getWaveComposition
 } from '../src/gameStore.js';
 
@@ -39,6 +40,11 @@ assert.ok(wave20.total > wave10.total, 'Wave 20 should be bigger than the old fi
 assert.ok(DIFFICULTIES.challenge.startingGold <= 250, 'Challenge should start with fewer Smile Coins.');
 assert.ok(DIFFICULTIES.challenge.startingLives <= 12, 'Challenge should start with lower Tooth Health.');
 assert.ok(DIFFICULTIES.challenge.spawnDelay <= 0.6, 'Challenge snacks should spawn closer together.');
+
+assert.equal(TOWER_TYPES.tomato.name, 'Tomato Splash', 'Tomato Splash should be available as a defender.');
+assert.equal(TOWER_TYPES.tomato.attackStyle, 'splash', 'Tomato Splash should hit clustered snacks.');
+assert.ok(TOWER_TYPES.tomato.cost > TOWER_TYPES.laser.cost, 'Tomato Splash should cost more than Carrot Shooter.');
+assert.ok(TOWER_TYPES.tomato.cost < TOWER_TYPES.cannon.cost, 'Tomato Splash should be cheaper than Broccoli Bomber.');
 
 const normalSnack = getEnemyStatsForWave(1, 'normal', 'normal');
 const challengeSnack = getEnemyStatsForWave(1, 'normal', 'challenge');

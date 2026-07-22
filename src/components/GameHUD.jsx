@@ -69,6 +69,7 @@ export default function GameHUD() {
     switch (type) {
       case 'laser': return <Carrot size={size} color={TOWER_TYPES.laser.color} />;
       case 'cannon': return <Sprout size={size} color={TOWER_TYPES.cannon.color} />;
+      case 'tomato': return <span aria-hidden="true" style={{ width: size, height: size, borderRadius: '50%', background: TOWER_TYPES.tomato.color, display: 'inline-block', boxShadow: 'inset -4px -4px 0 rgba(127,29,29,0.28)' }} />;
       case 'tesla': return <Milk size={size} color={TOWER_TYPES.tesla.color} />;
       default: return null;
     }

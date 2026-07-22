@@ -13,6 +13,14 @@ All notable changes to this project are recorded in this file.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
 
+## [1.13.0] - 2026-07-21
+
+### Added
+
+- Added Tomato Splash as a new healthy-food defender.
+- Added red tomato projectiles, splash particles, and a tomato defender model.
+- Added game-rules checks for Tomato Splash cost and splash behavior.
+
 ## [1.12.0] - 2026-07-21
 
 ### Added
