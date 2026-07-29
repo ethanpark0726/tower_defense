@@ -6,12 +6,18 @@ All notable changes to this project are recorded in this file.
 
 ### Added
 
+- Added an automated documentation consistency check for README status, package version, and CHANGELOG alignment.
+- Added mandatory documentation and post-merge verification rules for coding agents.
 - Added project-scoped engineering skills under `.agents/skills/` with `skills-lock.json` for reproducible agent-assisted workflows.
 - Added `CONTEXT.md` with shared tooth-defense domain language for coding agents.
 - Added Ponytail guidance to keep future implementation phases small without weakening required validation.
 - Added repository-level `AGENTS.md` instructions with layered implementation, mandatory visual validation, regression checks, and completion criteria.
 - Added GitHub Actions validation for pull requests and `main` pushes.
 - Added a reusable English-only product and documentation check.
+
+### Changed
+
+- Replaced the temporary Phase 17 review label in README with stable project and completion status.
 
 ## [1.15.0] - 2026-07-21
 

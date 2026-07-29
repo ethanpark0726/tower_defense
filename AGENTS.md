@@ -32,7 +32,7 @@ These instructions apply to the entire repository.
 Before implementing a phase:
 
 1. Define the player-facing goal, scope, exclusions, risks, and observable acceptance criteria.
-2. Create or use an `agent/phase-<number>-<feature>` branch.
+2. Start from the latest `main` and create or use an `agent/<phase-or-feature>` branch.
 3. Identify unrelated working-tree changes and do not stage or overwrite them.
 
 Implement gameplay features in small layers:
@@ -43,6 +43,21 @@ Implement gameplay features in small layers:
 4. Behavior and interactions
 5. Animation, particles, sound, and polish
 6. Final browser and regression validation
+
+## Mandatory Documentation and Git Workflow
+
+For every user-visible feature or bug fix:
+
+1. Update `README.md` when features, gameplay, controls, setup, screenshots, or project status change.
+2. Add the user-visible change to `CHANGELOG.md`.
+3. Keep the `package.json` version, README version badge, and matching CHANGELOG release entry aligned.
+4. Keep temporary workflow states such as `draft`, `in review`, and `pending` in GitHub, never in README.
+5. Run all required checks before committing.
+6. Commit only intended files, push the feature branch, and open a pull request.
+7. Wait for user testing and explicit approval before merging into `main`.
+8. After merging, verify that `main` is current, clean, and passes `npm run check:docs`.
+
+Do not report a user-visible change as complete when its README or CHANGELOG update is missing.
 
 ## Mandatory Visual Validation
 
@@ -70,6 +85,7 @@ Implement gameplay features in small layers:
 Run all applicable checks before publishing a phase:
 
 - `git diff --check`
+- `npm run check:docs`
 - English-only scan of product files and documentation
 - `npm run build`
 - Browser test through the normal player flow
@@ -89,6 +105,7 @@ A phase is complete only when:
 - The production build succeeds.
 - Relevant regressions pass.
 - README and CHANGELOG are current.
+- README contains no temporary pull-request status.
 - Only intended files are committed.
 - The Draft Pull Request records the change, user impact, root cause of fixes, validation evidence, warnings, and unverified cases.
 

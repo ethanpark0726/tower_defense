@@ -47,5 +47,8 @@ jobs:
       - name: Check English-only policy
         run: npm run check:english
 
+      - name: Check documentation consistency
+        run: npm run check:docs
+
       - name: Build production bundle
         run: npm run build

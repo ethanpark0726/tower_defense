@@ -5,7 +5,7 @@
 ![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-111111?logo=three.js&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)
-![Status](https://img.shields.io/badge/status-phase%2017%20in%20review-f59e0b)
+![Status](https://img.shields.io/badge/status-active%20development-22c55e)
 ![License](https://img.shields.io/badge/license-all%20rights%20reserved-6b7280)
 
 A browser-based 3D tower defense game built with React, Three.js, React Three Fiber, and Zustand. The project is being developed in small, reviewable phases toward a child-friendly tooth-defense theme.
@@ -40,7 +40,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 14: two-route stage variety for early and late waves - complete
 - Phase 15: Tomato Splash defender - complete
 - Phase 16: friendly tooth character redesign - complete
-- Phase 17: friendly lion-mouth board and Tomato Ketchup slow - in review
+- Phase 17: friendly lion-mouth board and Tomato Ketchup slow - complete
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
@@ -77,11 +77,12 @@ The production files are generated in `dist/`, which is intentionally excluded f
 
 ```powershell
 npm run check:english
+npm run check:docs
 npm run check:rules
 npm run build
 ```
 
-GitHub Actions runs the English-only policy check, commit whitespace validation, and production build for every pull request targeting `main` and every push to `main`.
+GitHub Actions runs documentation consistency, the English-only policy check, commit whitespace validation, and the production build for every pull request targeting `main` and every push to `main`.
 
 ## Game Controls
 
@@ -115,7 +116,9 @@ src/
   gameStore.js             Game rules, entities, and Zustand state
   index.css                Global UI styles
 scripts/
+  check-docs.mjs           Documentation and version consistency check
   check-english.mjs        English-only product and documentation check
+  check-game-rules.mjs     Core gameplay regression check
 .github/workflows/
   ci.yml                   Pull request and main-branch validation
 ```
@@ -130,6 +133,7 @@ scripts/
 - Build and browser smoke tests are completed before merging.
 - Visual features require direct screenshot or browser inspection; state changes alone are not sufficient evidence.
 - User-facing changes are recorded in `CHANGELOG.md`.
+- Temporary review states belong in GitHub pull requests, not README.
 - Agent-assisted work uses the repository-local skills, `CONTEXT.md`, and the Ponytail bias in `AGENTS.md` without replacing required visual validation.
 
 ## Technology
