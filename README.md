@@ -1,7 +1,7 @@
 # Tower Defense 3D
 
 [![CI](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml)
-![Version](https://img.shields.io/badge/version-1.16.0-7bdff2)
+![Version](https://img.shields.io/badge/version-1.16.1-7bdff2)
 ![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-111111?logo=three.js&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)

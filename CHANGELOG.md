@@ -4,6 +4,12 @@ All notable changes to this project are recorded in this file.
 
 ## [Unreleased]
 
+## [1.16.1] - 2026-07-30
+
+### Fixed
+
+- Made mobile menu overlays use the visible viewport, safe-area padding, and page-level touch scrolling so the Start button remains reachable on iPhone and iPad.
+
 ## [1.16.0] - 2026-07-29
 
 ### Added
