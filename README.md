@@ -12,8 +12,6 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 
 ## Play Online
 
-After GitHub Pages deployment is enabled, play at:
-
 https://ethanpark0726.github.io/tower_defense/
 
 On iPad, open the game in Safari, use Share, select Add to Home Screen, and enable Open as Web App.
@@ -50,7 +48,7 @@ On iPad, open the game in Safari, use Share, select Add to Home Screen, and enab
 - Phase 15: Tomato Splash defender - complete
 - Phase 16: friendly tooth character redesign - complete
 - Phase 17: friendly lion-mouth board and Tomato Ketchup slow - complete
-- Phase 18: deferred 3D bundles and GitHub Pages delivery - complete
+- Phase 18: deferred 3D bundles and GitHub Pages delivery
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
