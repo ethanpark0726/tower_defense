@@ -48,7 +48,7 @@ On iPad, open the game in Safari, use Share, select Add to Home Screen, and enab
 - Phase 15: Tomato Splash defender - complete
 - Phase 16: friendly tooth character redesign - complete
 - Phase 17: friendly lion-mouth board and Tomato Ketchup slow - complete
-- Phase 18: deferred 3D bundles and GitHub Pages delivery
+- Phase 18: deferred 3D bundles and GitHub Pages delivery - complete
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
