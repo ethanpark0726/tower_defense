@@ -4,8 +4,13 @@ All notable changes to this project are recorded in this file.
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-07-29
+
 ### Added
 
+- Added a child-friendly loading message while the 3D playfield downloads.
+- Added automatic GitHub Pages deployment for every push to `main`.
+- Added iPad Home Screen installation guidance to README.
 - Added an automated documentation consistency check for README status, package version, and CHANGELOG alignment.
 - Added mandatory documentation and post-merge verification rules for coding agents.
 - Added project-scoped engineering skills under `.agents/skills/` with `skills-lock.json` for reproducible agent-assisted workflows.
@@ -17,6 +22,8 @@ All notable changes to this project are recorded in this file.
 
 ### Changed
 
+- Deferred the 3D game engine until a patrol starts and split Three.js, React Three Fiber, and visual effects into cacheable production chunks.
+- Reduced the initial JavaScript loaded by the menu from one 1.23 MB bundle to a 53 KB app chunk plus a 146 KB React chunk before compression.
 - Replaced the temporary Phase 17 review label in README with stable project and completion status.
 
 ## [1.15.0] - 2026-07-21

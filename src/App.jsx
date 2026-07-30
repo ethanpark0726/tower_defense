@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import GameCanvas from './components/GameCanvas';
 import GameHUD from './components/GameHUD';
 import SoundFeedback from './components/SoundFeedback';
 import { DIFFICULTIES, useGameStore } from './gameStore';
 import { Play, RotateCcw, AlertTriangle, ShieldCheck, Heart, Sparkles, Smile, Shield, Flame } from 'lucide-react';
+
+const GameCanvas = lazy(() => import('./components/GameCanvas'));
 
 function CelebrationEffects() {
   const lastWaveReward = useGameStore((state) => state.lastWaveReward);
@@ -38,7 +39,15 @@ export default function App() {
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       
       {/* 3D Game Canvas */}
-      {gameStatus !== 'menu' && <GameCanvas />}
+      {gameStatus !== 'menu' && (
+        <Suspense fallback={(
+          <div className="screen-overlay">
+            <div className="glass-panel modal-card">Preparing the mouth...</div>
+          </div>
+        )}>
+          <GameCanvas />
+        </Suspense>
+      )}
 
       {/* In-Game HUD overlay */}
       {gameStatus === 'playing' && <GameHUD />}

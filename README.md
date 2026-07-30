@@ -1,7 +1,7 @@
 # Tower Defense 3D
 
 [![CI](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanpark0726/tower_defense/actions/workflows/ci.yml)
-![Version](https://img.shields.io/badge/version-1.15.0-7bdff2)
+![Version](https://img.shields.io/badge/version-1.16.0-7bdff2)
 ![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-111111?logo=three.js&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)
@@ -9,6 +9,12 @@
 ![License](https://img.shields.io/badge/license-all%20rights%20reserved-6b7280)
 
 A browser-based 3D tower defense game built with React, Three.js, React Three Fiber, and Zustand. The project is being developed in small, reviewable phases toward a child-friendly tooth-defense theme.
+
+## Play Online
+
+https://ethanpark0726.github.io/tower_defense/
+
+On iPad, open the game in Safari, use Share, select Add to Home Screen, and enable Open as Web App.
 
 ## Feature Highlights
 
@@ -21,6 +27,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Extended 20-wave patrols with tougher Challenge scaling.
 - Generated Web Audio effects and background music with no external audio files.
 - Brush Blast, a once-per-wave ability that scrubs visible snacks on the route.
+- Faster menu loading with the 3D engine deferred until a patrol starts.
 
 ## Current Status
 
@@ -41,6 +48,7 @@ A browser-based 3D tower defense game built with React, Three.js, React Three Fi
 - Phase 15: Tomato Splash defender - complete
 - Phase 16: friendly tooth character redesign - complete
 - Phase 17: friendly lion-mouth board and Tomato Ketchup slow - complete
+- Phase 18: deferred 3D bundles and GitHub Pages delivery
 
 See [CHANGELOG.md](CHANGELOG.md) for the implementation history.
 
@@ -82,7 +90,7 @@ npm run check:rules
 npm run build
 ```
 
-GitHub Actions runs documentation consistency, the English-only policy check, commit whitespace validation, and the production build for every pull request targeting `main` and every push to `main`.
+GitHub Actions validates every pull request targeting `main`. Every push to `main` also builds and deploys the production game to GitHub Pages.
 
 ## Game Controls
 
@@ -121,6 +129,7 @@ scripts/
   check-game-rules.mjs     Core gameplay regression check
 .github/workflows/
   ci.yml                   Pull request and main-branch validation
+  deploy-pages.yml         GitHub Pages production deployment
 ```
 
 `standalone_demo.html` is a legacy self-contained demo. The Vite/React application under `src/` is the primary implementation and receives new gameplay features first.
