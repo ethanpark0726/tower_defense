@@ -40,6 +40,7 @@ body {
   overflow: hidden;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
 }
 
 #root {
@@ -514,6 +515,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background:
     radial-gradient(circle at 20% 20%, rgba(123, 223, 242, 0.28), transparent 35%),
     radial-gradient(circle at 80% 75%, rgba(102, 187, 69, 0.24), transparent 38%),
@@ -964,6 +966,12 @@ body {
 }
 
 @media (max-width: 680px) {
+  .screen-overlay {
+    display: block;
+    overflow-y: auto;
+    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
   .stat-label, .wave-label { font-size: 0.62rem; }
   .stat-card { min-width: auto; padding: 9px; }
   .stat-icon { display: none; }
@@ -974,11 +982,11 @@ body {
   .tutorial-tooltip { width: calc(100vw - 30px); white-space: normal; justify-content: center; text-align: center; }
   .reward-banner { min-width: 0; width: calc(100vw - 30px); top: 126px; }
   .wave-preview { top: 126px; width: 240px; padding: 12px; }
-  .modal-card { padding: 28px 20px; }
+  .modal-card { width: 100%; margin: 0 auto; padding: 28px 20px; }
   .brush-power { bottom: 128px; }
   .brush-power-btn { width: 142px; }
   .brush-blast-message { min-width: 0; width: calc(100vw - 40px); padding: 15px 18px; }
   .difficulty-options { grid-template-columns: 1fr; }
   .difficulty-option { min-height: 0; display: grid; grid-template-columns: auto 70px 1fr; text-align: left; }
-  .start-menu { max-height: calc(100vh - 24px); overflow-y: auto; }
+  .start-menu { max-height: none; overflow: visible; }
 }
